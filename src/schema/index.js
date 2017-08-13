@@ -1,5 +1,7 @@
 import { makeExecutableSchema } from 'graphql-tools';
 
+import resolvers from './resolvers';
+
 const typeDefs = `
 type Link {
   id: ID!
@@ -12,4 +14,4 @@ type Query {
 }
 `;
 
-module.exports = makeExecutableSchema({ typeDefs });
+module.exports = makeExecutableSchema({ typeDefs, resolvers });
