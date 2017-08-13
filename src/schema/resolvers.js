@@ -14,14 +14,17 @@ const links = [
 
 module.exports = {
   Query: {
-    allLinks: () => links,
+    allLinks: async (root, data, { mongo: { Links } }) => {
+      return await Links.find({}).toArray();
+    },
   },
   Mutation: {
-    createLink: (_, { url, description }) => {
-      const newLink = { id: links.length + 1, url, description };
-      links.push(newLink);
-      console.log(newLink);
-      return newLink;
-    }
+    createLink: async (root, data, { mongo: { Links } }) => {
+      const response = await Links.insert(data);
+      return { id: response.insertedIds[0], ...data };
+    },
+  },
+  Link: {
+    id: root => root._id || root.id,
   }
 };
