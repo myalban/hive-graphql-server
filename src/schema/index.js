@@ -8,6 +8,7 @@ type Link {
   url: String!
   description: String!
   postedBy: User
+  votes: [Vote!]!
 }
 
 type Query {
@@ -16,6 +17,7 @@ type Query {
 
 type Mutation {
   createLink(url: String!, description: String!): Link
+  createVote(linkId: ID!): Vote
   createUser(name: String!, authProvider: AuthProviderSignupData!): User
   signinUser(email: AUTH_PROVIDER_EMAIL): SignInPayload!
 }
@@ -24,6 +26,7 @@ type User {
   id: ID!
   name: String!
   email: String
+  votes: [Vote!]!
 }
 
 input AuthProviderSignupData {
@@ -38,6 +41,12 @@ input AUTH_PROVIDER_EMAIL {
 type SignInPayload {
   token: String
   user: User
+}
+
+type Vote {
+  id: ID!
+  user: User!
+  link: Link!
 }
 `;
 

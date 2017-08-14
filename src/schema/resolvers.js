@@ -1,3 +1,5 @@
+import { ObjectID } from 'mongodb';
+
 module.exports = {
   Query: {
     allLinks: async (root, data, { mongo: { Links }, user }) => {
@@ -28,6 +30,14 @@ module.exports = {
         return { token: `token-${user.email}`, user };
       }
     },
+    createVote: async (root, data, { mongo: { Votes }, user }) => {
+      const newVote = {
+        userId: user && user._id,
+        linkId: new ObjectID(data.linkId),
+      };
+      const response = await Votes.insert(newVote);
+      return { id: response.insertedIds[0], ...newVote };
+    },
   },
   Link: {
     // Convert the "_id" field from MongoDB to "id" from the schema.
@@ -35,9 +45,25 @@ module.exports = {
     postedBy: async ({ postedById }, data, { mongo: { Users } }) => {
       return await Users.findOne({ _id: postedById });
     },
+    votes: async ({ _id }, data, { mongo: { Votes } }) => {
+      return await Votes.find({ linkId: _id }).toArray();
+    },
   },
   User: {
     // Convert the "_id" field from MongoDB to "id" from the schema.
     id: root => root._id || root.id,
+    votes: async ({ _id }, data, { mongo: { Votes } }) => {
+      return await Votes.find({ userId: _id }).toArray();
+    },
+  },
+  Vote: {
+    // Convert the "_id" field from MongoDB to "id" from the schema.
+    id: root => root._id || root.id,
+    user: async ({ userId }, data, { mongo: { Users } }) => {
+      return await Users.findOne({ _id: userId });
+    },
+    link: async ({ linkId }, data, { mongo: { Links } }) => {
+      return await Links.findOne({ _id: linkId });
+    },
   },
 };
