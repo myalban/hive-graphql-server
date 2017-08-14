@@ -5,6 +5,7 @@ import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 
 import schema from './schema';
 import connectMongo from './mongo-connector';
+import { authenticate } from './authentication';
 
 const start = async () => {
   const mongo = await connectMongo();
@@ -13,12 +14,23 @@ const start = async () => {
   // Global middleware
   app.use(morgan('dev'));
 
+  // Set up shared context
+  const buildOptions = async (req, res) => {
+    const user = await authenticate(req, mongo.Users);
+    return {
+      context: { mongo, user },
+      schema,
+    };
+  };
+
   // Set up Graphql endpoint and middleware
-  app.use('/graphql', bodyParser.json(), graphqlExpress({ context: { mongo }, schema }));
+  app.use('/graphql', bodyParser.json(), graphqlExpress(buildOptions));
 
   // GraphiQL
   app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql',
+    // Temporary -- force unsafe token
+    passHeader: `'Authorization': 'bearer token-eric@hive.com'`,
   }));
 
   const PORT = 3000;
