@@ -42,8 +42,9 @@ module.exports = {
   Link: {
     // Convert the "_id" field from MongoDB to "id" from the schema.
     id: root => root._id || root.id,
-    postedBy: async ({ postedById }, data, { mongo: { Users } }) => {
-      return await Users.findOne({ _id: postedById });
+    // Use data loader if key value is present, otherwise return null
+    postedBy: async ({ postedById }, data, { dataloaders: { userLoader } }) => {
+      return await postedById ? userLoader.load(postedById) : null;
     },
     votes: async ({ _id }, data, { mongo: { Votes } }) => {
       return await Votes.find({ linkId: _id }).toArray();
@@ -59,8 +60,9 @@ module.exports = {
   Vote: {
     // Convert the "_id" field from MongoDB to "id" from the schema.
     id: root => root._id || root.id,
-    user: async ({ userId }, data, { mongo: { Users } }) => {
-      return await Users.findOne({ _id: userId });
+    // Use data loader if key value is present, otherwise return null
+    user: async ({ userId }, data, { dataloaders: { userLoader } }) => {
+      return await userId ? userLoader.load(userId) : null;
     },
     link: async ({ linkId }, data, { mongo: { Links } }) => {
       return await Links.findOne({ _id: linkId });

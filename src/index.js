@@ -5,6 +5,7 @@ import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 
 import schema from './schema';
 import connectMongo from './mongo-connector';
+import buildDataloaders from './dataloaders';
 import { authenticate } from './authentication';
 
 const start = async () => {
@@ -18,7 +19,13 @@ const start = async () => {
   const buildOptions = async (req, res) => {
     const user = await authenticate(req, mongo.Users);
     return {
-      context: { mongo, user },
+      context: {
+        mongo,
+        user,
+        // Use data loader instead of direct mongo calls
+        // so we cache data across each request.
+        dataloaders: buildDataloaders(mongo),
+      },
       schema,
     };
   };
