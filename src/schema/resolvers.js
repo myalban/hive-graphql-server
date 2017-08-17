@@ -1,5 +1,6 @@
 import { ObjectID } from 'mongodb';
 import { URL } from 'url';
+import pubsub from '../pubsub';
 
 class ValidationError extends Error {
   constructor(message, field) {
@@ -27,7 +28,12 @@ module.exports = {
       assertValidLink(data);
       const newLink = { postedById: user && user._id, ...data };
       const response = await Links.insert(newLink);
-      return { id: response.insertedIds[0], ...newLink };
+      newLink.id = response.insertedIds[0];
+
+      // Push event to pubsub
+      pubsub.publish('Link', { Link: { mutation: 'CREATED', node: newLink } });
+
+      return newLink;
     },
     createUser: async (root, data, { mongo: { Users } }) => {
       // Convert the given arguments into the format for the
@@ -54,6 +60,11 @@ module.exports = {
       };
       const response = await Votes.insert(newVote);
       return { id: response.insertedIds[0], ...newVote };
+    },
+  },
+  Subscription: {
+    Link: {
+      subscribe: () => pubsub.asyncIterator('Link'),
     },
   },
   Link: {

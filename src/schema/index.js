@@ -48,6 +48,25 @@ type Vote {
   user: User!
   link: Link!
 }
+
+type Subscription {
+  Link(filter: LinkSubscriptionFilter): LinkSubscriptionPayload
+}
+
+input LinkSubscriptionFilter {
+  mutation_in: [_ModelMutationType!]
+}
+
+type LinkSubscriptionPayload {
+  mutation_in: _ModelMutationType!
+  node: Link
+}
+
+enum _ModelMutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
 `;
 
 module.exports = makeExecutableSchema({ typeDefs, resolvers });

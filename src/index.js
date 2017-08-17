@@ -2,12 +2,17 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+import { execute, subscribe } from 'graphql';
+import { createServer } from 'http';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 
 import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import { authenticate } from './authentication';
 import formatError from './format-error';
+
+const PORT = 3000;
 
 const start = async () => {
   const mongo = await connectMongo();
@@ -41,10 +46,16 @@ const start = async () => {
     endpointURL: '/graphql',
     // Temporary -- force unsafe token
     passHeader: `'Authorization': 'bearer token-eric@hive.com'`,
+    subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,
   }));
 
-  const PORT = 3000;
-  app.listen(PORT, () => {
+  const server = createServer(app);
+  server.listen(PORT, () => {
+    // Start WS subscription server
+    SubscriptionServer.create(
+      { execute, subscribe, schema },
+      { server, path: '/subscriptions' }
+    );
     console.log(`HN GraphQL server started at http://localhost:${PORT}`);
   });
 };
