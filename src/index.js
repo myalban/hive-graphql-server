@@ -10,7 +10,7 @@ import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import { authenticate } from './authentication';
-import formatError from './format-error';
+import formatError from './utils/format-error';
 
 const PORT = 3000;
 
