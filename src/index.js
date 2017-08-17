@@ -7,6 +7,7 @@ import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import { authenticate } from './authentication';
+import formatError from './format-error';
 
 const start = async () => {
   const mongo = await connectMongo();
@@ -26,6 +27,8 @@ const start = async () => {
         // so we cache data across each request.
         dataloaders: buildDataloaders(mongo),
       },
+      // Custom error formatting to show `field` if present.
+      formatError,
       schema,
     };
   };
