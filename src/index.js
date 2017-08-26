@@ -38,6 +38,18 @@ const start = async () => {
     };
   };
 
+  // Enable CORS and handle 'OPTIONS' requests
+  // since graphql only allows GET and POST requests.
+  // NOTE: Is this correct? https://github.com/graphql/express-graphql/issues/14
+  app.use('/graphql', function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(200);
+    } else {
+      next();
+    }
+  });
   // Set up Graphql endpoint and middleware
   app.use('/graphql', bodyParser.json(), graphqlExpress(buildOptions));
 
