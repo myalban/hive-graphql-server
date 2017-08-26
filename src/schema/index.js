@@ -7,6 +7,7 @@ type Link {
   id: ID!
   url: String!
   description: String!
+  createdAt: String!
   postedBy: User
   votes: [Vote!]!
 }

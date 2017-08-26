@@ -36,7 +36,7 @@ module.exports = {
   Mutation: {
     createLink: async (root, data, { mongo: { Links }, user }) => {
       assertValidLink(data);
-      const newLink = { postedById: user && user._id, ...data };
+      const newLink = { postedById: user && user._id, createdAt: new Date(), ...data };
       const response = await Links.insert(newLink);
       newLink.id = response.insertedIds[0];
 
