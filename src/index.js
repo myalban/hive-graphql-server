@@ -12,7 +12,7 @@ import buildDataloaders from './dataloaders';
 import { authenticate } from './authentication';
 import formatError from './utils/format-error';
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3030;
 
 const start = async () => {
   const mongo = await connectMongo();

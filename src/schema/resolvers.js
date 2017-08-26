@@ -1,5 +1,4 @@
 import { ObjectID } from 'mongodb';
-import { URL } from 'url';
 import pubsub from '../pubsub';
 import { assertValidLink } from '../utils/validation';
 
