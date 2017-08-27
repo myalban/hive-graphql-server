@@ -10,7 +10,7 @@ import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
-import { getUserForContext } from './auth/meteor-auth';
+import { getUserForContext } from './auth/meteor-authentication';
 
 const PORT = process.env.PORT || 3030;
 
