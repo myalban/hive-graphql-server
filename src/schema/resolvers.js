@@ -32,6 +32,13 @@ module.exports = {
       }
       return cursor.toArray();
     },
+    allWorkspaces: async (root, data, { mongo: { Workspaces }, user }) => {
+      const cursor = Workspaces.find({
+        members: { $in: [user._id] },
+        deleted: { $ne: true },
+      });
+      return cursor.toArray();
+    },
   },
   Mutation: {
     createLink: async (root, data, { mongo: { Links }, user }) => {
@@ -89,6 +96,13 @@ module.exports = {
     },
     votes: async ({ _id }, data, { mongo: { Votes } }) => {
       return await Votes.find({ linkId: _id }).toArray();
+    },
+  },
+  Workspace: {
+    // Convert the "_id" field from MongoDB to "id" from the schema.
+    id: root => root._id || root.id,
+    members: async ({ _id, name, members = [] }, data, { dataloaders: { userLoader } }) => {
+      return await members.length ? userLoader.loadMany(members) : [];
     },
   },
   User: {

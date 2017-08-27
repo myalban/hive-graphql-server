@@ -12,8 +12,15 @@ type Link {
   votes: [Vote!]!
 }
 
+type Workspace {
+  id: ID!
+  name: String!
+  members: [User!]!
+}
+
 type Query {
   allLinks(filter: LinkFilter, skip: Int, first: Int): [Link!]!
+  allWorkspaces: [Workspace!]!
 }
 
 input LinkFilter {
