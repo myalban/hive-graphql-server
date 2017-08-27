@@ -9,8 +9,8 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
-import { authenticate } from './authentication';
 import formatError from './utils/format-error';
+import { getUserForContext } from './auth/meteor-auth';
 
 const PORT = process.env.PORT || 3030;
 
@@ -23,7 +23,12 @@ const start = async () => {
 
   // Set up shared context
   const buildOptions = async (req, res) => {
-    const user = await authenticate(req, mongo.Users);
+    // Get the login token from the request headers, given by the Meteor's
+    // network interface middleware if enabled/
+    // TODO: Figure out how to easily set this up from whatever GraphQL client we use.
+    const loginToken = req.headers['meteor-login-token'];
+    // Get the current user for the context
+    const user = await getUserForContext(loginToken, mongo.Users);
     return {
       context: {
         mongo,
@@ -57,7 +62,11 @@ const start = async () => {
   app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql',
     // Temporary -- force unsafe token
-    passHeader: `'Authorization': 'bearer token-eric@hive.com'`,
+    passHeader: `
+      'Authorization': 'bearer token-eric@hive.com',
+      'meteor-login-token': 'bwF_l0qVt8zczkg9z9u63DuNdUSeniBuSrZJbOocW60'
+    `,
+    // passHeader: `'Authorization': localStorage['Meteor.loginToken']`,
     subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,
   }));
 
