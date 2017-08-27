@@ -45,6 +45,8 @@ module.exports = {
 
       return newLink;
     },
+    // NOTE: Not used anymore. Was used with old ./src/auth/authenticate.
+    // Maybe replace with Meteor signin, but leave for now.
     createUser: async (root, data, { mongo: { Users } }) => {
       // Convert the given arguments into the format for the
       // `User` type, grabbing email and password from the "authProvider".
@@ -56,7 +58,8 @@ module.exports = {
       const response = await Users.insert(newUser);
       return { id: response.insertedIds[0], ...newUser };
     },
-    // TODO: Use JWT instead
+    // NOTE: Not used anymore. Was used with old ./src/auth/authenticate.
+    // Maybe replace with Meteor signin, but leave for now.
     signinUser: async (root, data, { mongo: { Users } }) => {
       const user = await Users.findOne({ email: data.email.email });
       if (data.email.password === user.password) {
@@ -91,6 +94,16 @@ module.exports = {
   User: {
     // Convert the "_id" field from MongoDB to "id" from the schema.
     id: root => root._id || root.id,
+    name: ({ profile }) => {
+      // Combine first and last names
+      if (profile.firstName && profile.lastName) {
+        return `${profile.firstName} ${profile.lastName}`;
+      }
+      return '';
+    },
+    email: ({ emails }) => {
+      return emails[0] ? emails[0].address : '';
+    },
     votes: async ({ _id }, data, { mongo: { Votes } }) => {
       return await Votes.find({ userId: _id }).toArray();
     },

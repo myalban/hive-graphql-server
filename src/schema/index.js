@@ -25,8 +25,19 @@ input LinkFilter {
 type Mutation {
   createLink(url: String!, description: String!): Link
   createVote(linkId: ID!): Vote
+  # Neither is used at the moment. Meteor will handle these.
   createUser(name: String!, authProvider: AuthProviderSignupData!): User
   signinUser(email: AUTH_PROVIDER_EMAIL): SignInPayload!
+}
+
+# Unused at the moment. Meteor will handle these.
+input AuthProviderSignupData {
+  email: AUTH_PROVIDER_EMAIL
+}
+# Unused at the moment. Meteor will handle these.
+input AUTH_PROVIDER_EMAIL {
+  email: String!
+  password: String!
 }
 
 type User {
@@ -34,15 +45,6 @@ type User {
   name: String!
   email: String
   votes: [Vote!]!
-}
-
-input AuthProviderSignupData {
-  email: AUTH_PROVIDER_EMAIL
-}
-
-input AUTH_PROVIDER_EMAIL {
-  email: String!
-  password: String!
 }
 
 type SignInPayload {
