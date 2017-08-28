@@ -36,6 +36,11 @@ type Query {
   allLinks(filter: LinkFilter, skip: Int, first: Int): [Link!]!
   allWorkspaces: [Workspace!]!
   myActions(workspace: String!, filters: MyActionsFilter): MyActionsPayload!
+  # Okay so, do we:
+  # √ Pass action view id one by one columns?
+  # - Pass action view id with limits per column? (e.g. return all at once)
+  # - Something else?
+  actionsForView(actionViewId: String!, columnId: String!): [Action!]!
 }
 
 type MyActionsPayload {

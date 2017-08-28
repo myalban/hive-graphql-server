@@ -60,6 +60,45 @@ module.exports = {
         count: cursor.count()
       };
     },
+    actionsForView: async (root, { actionViewId, columnId, limit = 15 }, { mongo: { ActionViews, Actions, Workspaces }, user }) => {
+      const actionView = await ActionViews.findOne({ _id: actionViewId });
+      const { workspace, labels, assignees, sortType, projectId, projects = [] } = actionView;
+      // TODO: Get view type for user (layout for user from user settings)
+      const viewType = actionView.viewType;
+      const getPrivacyClause = userId => [
+        { privacy: 'public' },
+        { privacy: 'private', assignees: userId },
+      ];
+      const query = {
+        workspace,
+        deleted: { $ne: true },
+        // recurring actions
+        $and: [{
+          $or: [
+            { isRecurringVisible: true, recurringId: { $ne: null } },
+            { recurringId: null },
+          ],
+        }, {
+          // Private and assigned to
+          // this user or public.
+          $or: getPrivacyClause(user._id),
+        }],
+      };
+      if (projectId) {
+        // Ensure access to project
+        query.projectId = projectId;
+      }
+      switch (viewType) {
+        case 'progress':
+          query.status = columnId;
+          query.checked = columnId === 'Completed' ? true : { $ne: true };
+          break;
+        default:
+          break;
+      }
+      const options = { sort: { rank: 1 }, limit };
+      return await Actions.find(query, options).toArray();
+    },
   },
   Mutation: {
     createLink: async (root, data, { mongo: { Links }, user }) => {
