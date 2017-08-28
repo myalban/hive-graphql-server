@@ -39,6 +39,27 @@ module.exports = {
       });
       return cursor.toArray();
     },
+    myActions: async (root, { workspace, filters = {} }, { mongo: { Actions, Workspaces }, user }) => {
+      const query = {
+        workspace,
+        assignees: user._id,
+        deleted: { $ne: true },
+        archived: { $ne: true },
+        isRecurringVisible: { $ne: false },
+        checked: { $ne: true },
+      };
+      const options = { sort: { rank: 1 } };
+      if (filters.actionType === 'completed') {
+        query.checked = true;
+        query.checkedDate = { $ne: null };
+        options.sort = { checkedDate: -1, rank: 1 };
+      }
+      const cursor = Actions.find(query, options);
+      return {
+        actions: cursor.toArray(),
+        count: cursor.count()
+      };
+    },
   },
   Mutation: {
     createLink: async (root, data, { mongo: { Links }, user }) => {
@@ -96,6 +117,14 @@ module.exports = {
     },
     votes: async ({ _id }, data, { mongo: { Votes } }) => {
       return await Votes.find({ linkId: _id }).toArray();
+    },
+  },
+  Action: {
+    // Convert the "_id" field from MongoDB to "id" from the schema.
+    id: root => root._id || root.id,
+    // assignees...
+    description: ({ description }) => {
+      return description ? description : '';
     },
   },
   Workspace: {

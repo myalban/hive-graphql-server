@@ -22,7 +22,8 @@ module.exports = async () => {
     Links: db.collection('links'),
     Votes: db.collection('votes'),
     // Use Meteor DB for some collections (eventually all)
-    Users: meteorDb.collection('users'),
+    Actions: meteorDb.collection('actions'),
     Workspaces: meteorDb.collection('workspaces'),
+    Users: meteorDb.collection('users'),
   };
 };

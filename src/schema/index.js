@@ -18,9 +18,34 @@ type Workspace {
   members: [User!]!
 }
 
+type Action {
+  id: ID!
+  title: String!
+  description: String!
+  workspace: Workspace!
+  status: String!
+  # Use a fragment here for 'none'?
+  # Considering other data will come from
+  # Meteor subscriptions, might be best to
+  # leave these as is instead of inrospective.
+  assignees: [String!]!
+  labels: [String!]!
+}
+
 type Query {
   allLinks(filter: LinkFilter, skip: Int, first: Int): [Link!]!
   allWorkspaces: [Workspace!]!
+  myActions(workspace: String!, filters: MyActionsFilter): MyActionsPayload!
+}
+
+type MyActionsPayload {
+  actions: [Action!]!
+  count: Int
+}
+
+input MyActionsFilter {
+  actionType: String!
+  # Limit and sort here?
 }
 
 input LinkFilter {
