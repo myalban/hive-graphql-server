@@ -13,6 +13,7 @@ module.exports = async () => {
     let logCount = 0;
     Logger.setCurrentLogger((msg, state) => {
       console.log(`MONGO DB REQUEST ${++logCount}`);
+      console.log(msg);
     });
     Logger.setLevel('debug');
     Logger.filter('class', ['Cursor']);
