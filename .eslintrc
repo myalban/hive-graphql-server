@@ -1,0 +1,31 @@
+{
+  "extends": "airbnb",
+  "rules": {
+    "new-cap": "off",
+    "no-underscore-dangle": "off",
+    "no-plusplus": "off",
+    "consistent-return": "off",
+    "no-param-reassign": "off",
+    "no-new": "off",
+    "object-shorthand": [
+      "error",
+      "always",
+      {
+        "avoidQuotes": false
+      }
+    ],
+    "import/imports-first": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/prefer-default-export": "off",
+    "meteor/eventmap-params": [
+      "error",
+      {
+        "eventParamName": "event",
+        "templateInstanceParamName": "instance"
+      }
+    ],
+    "meteor/template-names": [
+      "off"
+    ]
+  },
+}
