@@ -5,7 +5,7 @@ import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
-
+import { NotAuthorized } from './errors/not-authorized';
 import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
@@ -26,9 +26,13 @@ const start = async () => {
     // Get the login token from the request headers, given by the Meteor's
     // network interface middleware if enabled/
     // TODO: Figure out how to easily set this up from whatever GraphQL client we use.
-    const loginToken = req.headers['meteor-login-token'];
+    const loginToken = req.headers.authorization;
     // Get the current user for the context
     const user = await getUserForContext(loginToken, mongo.Users);
+    if (!user) {
+      throw new NotAuthorized();
+    }
+
     return {
       context: {
         mongo,
@@ -63,8 +67,7 @@ const start = async () => {
     endpointURL: '/graphql',
     // Temporary -- force unsafe token
     passHeader: `
-      'Authorization': 'bearer token-eric@hive.com',
-      'meteor-login-token': 'bwF_l0qVt8zczkg9z9u63DuNdUSeniBuSrZJbOocW60'
+      'Authorization': 'Bearer meteor-DBfHtUDIIUw4BNFYsmCuBnzsWLZ0b0_WNpgH9K0sAU6',
     `,
     // passHeader: `'Authorization': localStorage['Meteor.loginToken']`,
     subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,

@@ -39,20 +39,25 @@ module.exports = {
       });
       return cursor.toArray();
     },
-    myActions: async (root, { workspace, filters = {} }, { mongo: { Actions, Workspaces }, user }) => {
+    myActions: async (root, { workspace, filters = {}, limit = null },
+      { mongo: { Actions, Workspaces }, user }) => {
       const query = {
         workspace,
         assignees: user._id,
-        deleted: { $ne: true },
-        archived: { $ne: true },
+        deleted: false,
+        archived: false,
         isRecurringVisible: { $ne: false },
-        checked: { $ne: true },
+        checked: false,
       };
+      console.log(user._id);
       const options = { sort: { rank: 1 } };
       if (filters.actionType === 'completed') {
         query.checked = true;
         query.checkedDate = { $ne: null };
         options.sort = { checkedDate: -1, rank: 1 };
+      }
+      if (limit) {
+        options.limit = limit;
       }
       const cursor = Actions.find(query, options);
       return {
@@ -160,7 +165,7 @@ module.exports = {
   },
   Action: {
     // Convert the "_id" field from MongoDB to "id" from the schema.
-    id: root => root._id || root.id,
+    // id: root => root._id || root.id,
     // assignees...
     description: ({ description }) => {
       return description ? description : '';

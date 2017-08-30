@@ -17,15 +17,5 @@
     "import/imports-first": "off",
     "import/no-extraneous-dependencies": "off",
     "import/prefer-default-export": "off",
-    "meteor/eventmap-params": [
-      "error",
-      {
-        "eventParamName": "event",
-        "templateInstanceParamName": "instance"
-      }
-    ],
-    "meteor/template-names": [
-      "off"
-    ]
   },
 }

@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 
+const HEADER_REGEX = /Bearer meteor-(.*)$/;
+
 // Super simple port of Accounts._hashLoginToken
 // from Meteor: https://github.com/meteor/meteor/blob/master/packages/accounts-base/accounts_server.js
 const hashLoginToken = (loginToken) => {
@@ -12,11 +14,16 @@ const hashLoginToken = (loginToken) => {
 // the apollographql/meteor-integration, see here:
 // (https://github.com/apollographql/meteor-integration/blob/master/src/main-server.js)
 // TODO: Do we want to port anything else from that integration to here?
-export const getUserForContext = async (loginToken, Users) => {
-  if (typeof loginToken !== 'string') throw new Error('Login token must be string!');
+export const getUserForContext = async (authorization, Users) => {
+  if (typeof authorization !== 'string') throw new Error('Login token must be string!');
+
+  const match = authorization && HEADER_REGEX.exec(authorization);
+  const loginToken = match && match[1];
+  if (!loginToken) {
+    throw new Error('Invalid loginToken');
+  }
   // The hashed token is the key to find the possible current user in the db
   const hashedToken = hashLoginToken(loginToken);
-
   // Get the possible current user from the database
   const currentUser = await Users.findOne({
     'services.resume.loginTokens.hashedToken': hashedToken,

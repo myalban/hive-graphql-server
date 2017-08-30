@@ -18,24 +18,82 @@ type Workspace {
   members: [User!]!
 }
 
-type Action {
+type AncestorAttributes {
   id: ID!
+  title: String!
+  status: String!
+  assignees: [String!]!
+  labels: [String!]!
+}
+
+type Attachments {
+  id: ID!
+  type: String!
+}
+
+type CustomFields {
+  id: ID!
+  type: String!
+  label: String!
+  value: String
+}
+
+type GanttExpanded {
+  userId: ID!
+  open: Boolean
+  actionViewId: String
+}
+
+type Action {
+  _id: ID!
   title: String!
   description: String!
   workspace: Workspace!
   status: String!
-  # Use a fragment here for 'none'?
-  # Considering other data will come from
-  # Meteor subscriptions, might be best to
-  # leave these as is instead of inrospective.
   assignees: [String!]!
   labels: [String!]!
+  checked: Boolean!
+  deleted: Boolean!
+  formAction: String
+  checkedDate: String
+  createdAt: String
+  rank: Float
+  scheduledDate: String
+  deadline: String
+  parent: String
+  ancestorAttributes: [AncestorAttributes]
+  root: String
+  privacy: String
+  processId: String
+  projectId: String
+  attachments: [Attachments]
+  readBy: [String]
+  urgent: Boolean
+  hasComments: Boolean
+  hasSubactions: Boolean
+  allSubactions: Int
+  checkedSubactions: Int
+  lastMessage: String
+  messageId: String
+  assignedBy: String
+  completedBy: String
+  recurringId: String
+  isRecurringVisible: Boolean
+  bucket: String
+  newAction: Boolean
+  archived: Boolean
+  hasHistory: Boolean
+  modifiedAt: String
+  createdBy: String
+  modifiedBy: String
+  snoozeDate: String
+  ganttExpanded: [GanttExpanded]
 }
 
 type Query {
   allLinks(filter: LinkFilter, skip: Int, first: Int): [Link!]!
   allWorkspaces: [Workspace!]!
-  myActions(workspace: String!, filters: MyActionsFilter): MyActionsPayload!
+  myActions(workspace: String!, filters: MyActionsFilter, limit: Int): MyActionsPayload!
   # Okay so, do we:
   # √ Pass action view id one by one columns?
   # - Pass action view id with limits per column? (e.g. return all at once)
