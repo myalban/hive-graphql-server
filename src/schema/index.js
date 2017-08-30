@@ -13,13 +13,13 @@ type Link {
 }
 
 type Workspace {
-  id: ID!
+  _id: ID!
   name: String!
   members: [User!]!
 }
 
 type Action {
-  id: ID!
+  _id: ID!
   title: String!
   description: String!
   workspace: Workspace!
@@ -78,7 +78,7 @@ input AUTH_PROVIDER_EMAIL {
 }
 
 type User {
-  id: ID!
+  _id: ID!
   name: String!
   email: String
   votes: [Vote!]!
