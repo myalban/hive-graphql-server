@@ -1,6 +1,6 @@
 import { MongoClient, Logger } from 'mongodb';
 
-const MONGO_URL = 'mongodb://localhost:27017/hackernews';
+const MONGO_URL = 'mongodb://localhost:27017/temporaryhn';
 const METEOR_MONGO_URL = 'mongodb://localhost:3001/meteor';
 
 module.exports = async () => {
@@ -20,6 +20,7 @@ module.exports = async () => {
   }
 
   return {
+    // TODO: Remove these and schema/mutations
     Links: db.collection('links'),
     Votes: db.collection('votes'),
     // Use Meteor DB for some collections (eventually all)

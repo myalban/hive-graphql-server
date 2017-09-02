@@ -1,15 +1,13 @@
 {
-  "name": "howto-graphql-js",
-  "version": "1.0.0",
-  "description": "",
+  "name": "hive-graphql-server",
+  "version": "0.0.1",
+  "description": "Hive GraphQL express server",
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.js --exec babel-node",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "apollo-server-express": "^1.1.0",
     "body-parser": "^1.17.2",

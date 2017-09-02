@@ -11,9 +11,14 @@ This is a proof of concept built off of an earlier example application using [ap
 # Hive GraphQL server roadmap
 
 ## Short term objectives
+- [x] Default to open source
 - [ ] Recreate query for "My actions" view in GraphQL
 - [ ] Connect Meteor front-end to GraphQL server back-end for **loading data** into "My actions" view
 - [ ] Connect Meteor front-end to GraphQL server back-end for **mutating data** with optimistic UI on "My actions" view
+
+## Long term objectives
+- [ ] Make API public
+- [ ] Swap front-end with Apollo or Relay Modern in Hive UI
 
 ## High level setup
 - [x] Basic Meteor authentication based on localStorage token
