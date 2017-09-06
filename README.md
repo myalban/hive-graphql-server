@@ -29,7 +29,7 @@ This is a proof of concept built off of an earlier example application using [ap
 - [ ] Decide on how to split resolvers and schema into separate files
 - [ ] Deployment strategy
 - [ ] Figure out client-side client config
-- [ ] Figure out Impersonate
+- [ ] Figure out Support Mode
 - [ ] Add stress tests/benchmarking
 - [ ] Set up a screen share learning session for whole team
 
