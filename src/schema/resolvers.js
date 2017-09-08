@@ -3,6 +3,8 @@ import pubsub from '../pubsub';
 import { assertValidLink } from '../utils/validation';
 
 
+const dateAttributes = ['deadline', 'createdAt', 'modifiedAt', 'checkedDate', 'scheduledDate'];
+
 function buildFilters ({ OR = [], description_contains, url_contains }) {
   const filter = (description_contains || url_contains) ? {} : null;
   if (description_contains) {
@@ -39,8 +41,14 @@ module.exports = {
       });
       return cursor.toArray();
     },
-    myActions: async (root, { workspace, filters = {}, limit = null },
+    myActions: async (root, { workspace, filters = {}, limit = null, skip = 0 },
       { mongo: { Actions, Workspaces }, user }) => {
+
+      console.log(workspace);
+      console.log(limit);
+      console.log(skip);
+      console.log(filters);
+
       const query = {
         workspace,
         assignees: user._id,
@@ -50,19 +58,74 @@ module.exports = {
         checked: false,
       };
       console.log(user._id);
+
       const options = { sort: { rank: 1 } };
+      if (filters.sortType === 'deadline') {
+        options.sort = { deadline: -1, rank: 1 };
+      }
       if (filters.actionType === 'completed') {
         query.checked = true;
         query.checkedDate = { $ne: null };
         options.sort = { checkedDate: -1, rank: 1 };
       }
+
       if (limit) {
         options.limit = limit;
+        options.skip = skip;
       }
+
       const cursor = Actions.find(query, options);
       return {
         actions: cursor.toArray(),
         count: cursor.count()
+      };
+    },
+    actionList: async (root, { name, viewId, workspace, limit = null, skip = 0, filters = {} },
+      { mongo: { Actions, Workspaces }, user }) => {
+
+      console.log(workspace);
+      console.log(limit);
+      console.log(skip);
+      console.log(filters);
+
+      const query = {
+        workspace,
+        assignees: user._id,
+        deleted: false,
+        archived: false,
+        isRecurringVisible: { $ne: false },
+        checked: false,
+      };
+
+      const options = { sort: { rank: 1 } };
+      if (filters.sortType === 'deadline') {
+        options.sort = { deadline: -1, rank: 1 };
+      }
+
+      if (viewId === 'list') {
+        if (name !== 'Completed') {
+          query.bucket = name;
+        }
+      }
+
+      console.log(user._id);
+
+
+      if (filters.actionType === 'completed') {
+        query.checked = true;
+        query.checkedDate = { $ne: null };
+        options.sort = { checkedDate: -1, rank: 1 };
+      }
+
+      if (limit) {
+        options.limit = limit;
+        options.skip = skip;
+      }
+
+      const cursor = Actions.find(query, options);
+      return {
+        actions: cursor.toArray(),
+        count: cursor.count(),
       };
     },
     actionsForView: async (root, { actionViewId, columnId, limit = 15 }, { mongo: { ActionViews, Actions, Workspaces }, user }) => {
@@ -106,6 +169,29 @@ module.exports = {
     },
   },
   Mutation: {
+    updateAction: async (root, data, { mongo: { Actions }, user }) => {
+      console.log(data);
+      const { _id } = data.action;
+      dateAttributes.forEach((attr) => {
+        data.action[attr] = data.action[attr] && new Date(data.action[attr]);
+      });
+
+      const $set = data.action;
+
+      await Actions.update({ _id }, { $set });
+      return await Actions.findOne({ _id });
+    },
+    checkAction: async (root, data, { mongo: { Actions }, user }) => {
+      const $set = {
+        checkedDate: new Date(),
+        status: 'Completed',
+        modifiedBy: user._id,
+        modifiedAt: new Date(),
+        checked: true,
+      };
+      await Actions.update({ _id: data._id }, { $set });
+      return await Actions.findOne({ _id: data._id });
+    },
     createLink: async (root, data, { mongo: { Links }, user }) => {
       assertValidLink(data);
       const newLink = { postedById: user && user._id, createdAt: new Date(), ...data };

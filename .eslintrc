@@ -1,6 +1,7 @@
 {
   "extends": "airbnb",
   "rules": {
+    "no-return-await": "off",
     "new-cap": "off",
     "no-underscore-dangle": "off",
     "no-plusplus": "off",

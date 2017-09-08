@@ -48,7 +48,7 @@ type Action {
   _id: ID!
   title: String!
   description: String!
-  workspace: Workspace!
+  workspace: String!
   status: String!
   assignees: [String!]!
   labels: [String!]!
@@ -90,10 +90,55 @@ type Action {
   ganttExpanded: [GanttExpanded]
 }
 
+input ActionInput {
+  _id: ID!
+  title: String
+  description: String!
+  workspace: String!
+  status: String!
+  assignees: [String!]!
+  labels: [String!]!
+  checked: Boolean!
+  deleted: Boolean!
+  formAction: String
+  checkedDate: String
+  createdAt: String
+  rank: Float
+  scheduledDate: String
+  deadline: String
+  parent: String
+  root: String
+  privacy: String
+  processId: String
+  projectId: String
+  readBy: [String]
+  urgent: Boolean
+  hasComments: Boolean
+  hasSubactions: Boolean
+  allSubactions: Int
+  checkedSubactions: Int
+  lastMessage: String
+  messageId: String
+  assignedBy: String
+  completedBy: String
+  recurringId: String
+  isRecurringVisible: Boolean
+  bucket: String
+  newAction: Boolean
+  archived: Boolean
+  hasHistory: Boolean
+  modifiedAt: String
+  createdBy: String
+  modifiedBy: String
+  snoozeDate: String
+}
+
+
 type Query {
   allLinks(filter: LinkFilter, skip: Int, first: Int): [Link!]!
   allWorkspaces: [Workspace!]!
-  myActions(workspace: String!, filters: MyActionsFilter, limit: Int): MyActionsPayload!
+  myActions(workspace: String!, filters: MyActionsFilter, limit: Int, skip: Int): ActionList!
+  actionList(name: String!, viewId: String, workspace: String!, filters: MyActionsFilter, limit: Int, skip: Int): ActionList!
   # Okay so, do we:
   # √ Pass action view id one by one columns?
   # - Pass action view id with limits per column? (e.g. return all at once)
@@ -106,9 +151,14 @@ type MyActionsPayload {
   count: Int
 }
 
+type ActionList {
+  actions: [Action!]!
+  count: Int
+}
+
 input MyActionsFilter {
-  actionType: String!
-  # Limit and sort here?
+  actionType: String
+  sortType: String
 }
 
 input LinkFilter {
@@ -118,6 +168,9 @@ input LinkFilter {
 }
 
 type Mutation {
+  updateAction(action: ActionInput): Action!
+  checkAction(_id: String!): Action!
+  uncheckAction(_id: String!): Action!
   createLink(url: String!, description: String!): Link
   createVote(linkId: ID!): Vote
   # Neither is used at the moment. Meteor will handle these.
