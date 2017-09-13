@@ -1,18 +1,13 @@
-import { URL } from 'url';
-
-class ValidationError extends Error {
+class PermissionError extends Error {
   constructor(message, field) {
     super(message);
     this.field = field;
   }
 }
 
-module.exports = {
-  assertValidLink: ({ url }) => {
-    try {
-      new URL(url);
-    } catch (error) {
-      throw new ValidationError(`Link validation error: invalid url ${url}`, 'url');
-    }
+export async function assertUserPermission(workspaceId, userId, Workspaces) {
+  const wk = await Workspaces.findOne({ _id: workspaceId, members: userId });
+  if (!wk) {
+    throw new PermissionError(`User ${userId} has not permission to access ${workspaceId} `, 'workspace permission');
   }
-};
+}

@@ -1,16 +1,21 @@
 {
-  "name": "howto-graphql-js",
+  "name": "hive-graphql-js",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js --exec babel-node",
+    "compile": "babel -d ./build ./src -s",
+    "build": "npm run clean && npm run compile",
+    "start": "node ./build/index.js",
+    "clean": "rm -rf build && mkdir build",
+    "dev": "nodemon src/index.js --exec babel-node",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git",
     "apollo-errors": "^1.5.0",
     "apollo-server-express": "^1.1.0",
     "body-parser": "^1.17.2",

@@ -10,7 +10,7 @@ import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
-import { getUserForContext } from './auth/meteor-authentication';
+import { getUserForContext } from 'hive-graphql-auth';
 
 const PORT = process.env.PORT || 3030;
 
@@ -50,7 +50,7 @@ const start = async () => {
   // Enable CORS and handle 'OPTIONS' requests
   // since graphql only allows GET and POST requests.
   // NOTE: Is this correct? https://github.com/graphql/express-graphql/issues/14
-  app.use('/graphql', function (req, res, next) {
+  app.use('/graphql', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
     // console.log(req);
@@ -70,7 +70,6 @@ const start = async () => {
     passHeader: `
       'Authorization': 'Bearer meteor-DBfHtUDIIUw4BNFYsmCuBnzsWLZ0b0_WNpgH9K0sAU6',
     `,
-    // passHeader: `'Authorization': localStorage['Meteor.loginToken']`,
     subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,
   }));
 
@@ -79,7 +78,7 @@ const start = async () => {
     // Start WS subscription server
     SubscriptionServer.create(
       { execute, subscribe, schema },
-      { server, path: '/subscriptions' }
+      { server, path: '/subscriptions' },
     );
     console.log(`HN GraphQL server started at http://localhost:${PORT}`);
   });

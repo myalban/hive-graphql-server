@@ -3,21 +3,6 @@ import { makeExecutableSchema } from 'graphql-tools';
 import resolvers from './resolvers';
 
 const typeDefs = `
-type Link {
-  id: ID!
-  url: String!
-  description: String!
-  createdAt: String!
-  postedBy: User
-  votes: [Vote!]!
-}
-
-type Workspace {
-  id: ID!
-  name: String!
-  members: [User!]!
-}
-
 type AncestorAttributes {
   id: ID!
   title: String!
@@ -47,7 +32,7 @@ type GanttExpanded {
 type Action {
   _id: ID!
   title: String!
-  description: String!
+  description: String
   workspace: String!
   status: String!
   assignees: [String!]!
@@ -90,12 +75,18 @@ type Action {
   ganttExpanded: [GanttExpanded]
 }
 
+input AttachmentsInput {
+  id: ID!
+  type: String!
+}
+
 input ActionInput {
   _id: ID!
   title: String
-  description: String!
+  description: String
   workspace: String!
   status: String!
+  attachments: [AttachmentsInput]
   assignees: [String!]!
   labels: [String!]!
   checked: Boolean!
@@ -133,22 +124,8 @@ input ActionInput {
   snoozeDate: String
 }
 
-
 type Query {
-  allLinks(filter: LinkFilter, skip: Int, first: Int): [Link!]!
-  allWorkspaces: [Workspace!]!
-  myActions(workspace: String!, filters: MyActionsFilter, limit: Int, skip: Int): ActionList!
-  actionList(name: String!, viewId: String, workspace: String!, filters: MyActionsFilter, limit: Int, skip: Int): ActionList!
-  # Okay so, do we:
-  # √ Pass action view id one by one columns?
-  # - Pass action view id with limits per column? (e.g. return all at once)
-  # - Something else?
-  actionsForView(actionViewId: String!, columnId: String!): [Action!]!
-}
-
-type MyActionsPayload {
-  actions: [Action!]!
-  count: Int
+  actionList(name: String!, viewId: String, workspace: String!, filters: ActionListFilter, limit: Int, skip: Int): ActionList!
 }
 
 type ActionList {
@@ -156,67 +133,14 @@ type ActionList {
   count: Int
 }
 
-input MyActionsFilter {
+input ActionListFilter {
   actionType: String
   sortType: String
 }
 
-input LinkFilter {
-  OR: [LinkFilter!]
-  description_contains: String
-  url_contains: String
-}
-
 type Mutation {
+  insertAction(action: ActionInput): Action!
   updateAction(action: ActionInput): Action!
-  checkAction(_id: String!): Action!
-  uncheckAction(_id: String!): Action!
-  createLink(url: String!, description: String!): Link
-  createVote(linkId: ID!): Vote
-  # Neither is used at the moment. Meteor will handle these.
-  createUser(name: String!, authProvider: AuthProviderSignupData!): User
-  signinUser(email: AUTH_PROVIDER_EMAIL): SignInPayload!
-}
-
-# Unused at the moment. Meteor will handle these.
-input AuthProviderSignupData {
-  email: AUTH_PROVIDER_EMAIL
-}
-# Unused at the moment. Meteor will handle these.
-input AUTH_PROVIDER_EMAIL {
-  email: String!
-  password: String!
-}
-
-type User {
-  id: ID!
-  name: String!
-  email: String
-  votes: [Vote!]!
-}
-
-type SignInPayload {
-  token: String
-  user: User
-}
-
-type Vote {
-  id: ID!
-  user: User!
-  link: Link!
-}
-
-type Subscription {
-  Link(filter: LinkSubscriptionFilter): LinkSubscriptionPayload
-}
-
-input LinkSubscriptionFilter {
-  mutation_in: [_ModelMutationType!]
-}
-
-type LinkSubscriptionPayload {
-  mutation_in: _ModelMutationType!
-  node: Link
 }
 
 enum _ModelMutationType {

@@ -33,9 +33,9 @@ export const getUserForContext = async (authorization, Users) => {
   if (currentUser) {
     // find the right login token corresponding, the current user may have
     // several sessions logged on different browsers / computers
-    const tokenInformation = currentUser.services.resume.loginTokens.find(
-      tokenInfo => tokenInfo.hashedToken === hashedToken
-    );
+    // const tokenInformation = currentUser.services.resume.loginTokens.find(
+    //   tokenInfo => tokenInfo.hashedToken === hashedToken
+    // );
 
     // get an exploitable token expiration date
     // TODO: Port Accounts._tokenExpiration over
