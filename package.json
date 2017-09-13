@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git",
+    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#4b626259815b7eb9a9bd4a900eb0aecbc18b8411",
     "apollo-errors": "^1.5.0",
     "apollo-server-express": "^1.1.0",
     "body-parser": "^1.17.2",

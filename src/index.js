@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
+import { getUserForContext } from 'hive-graphql-auth';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
@@ -10,7 +11,6 @@ import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
-import { getUserForContext } from 'hive-graphql-auth';
 
 const PORT = process.env.PORT || 3030;
 
@@ -23,12 +23,8 @@ const start = async () => {
 
   // Set up shared context
   const buildOptions = async (req, res) => {
-    // Get the login token from the request headers, given by the Meteor's
-    // network interface middleware if enabled/
-    // TODO: Figure out how to easily set this up from whatever GraphQL client we use.
-    const loginToken = req.headers.authorization;
     // Get the current user for the context
-    const user = await getUserForContext(loginToken, mongo.Users);
+    const user = await getUserForContext(req.headers, mongo.Users);
     if (!user) {
       throw new NotAuthorized();
     }
@@ -52,7 +48,7 @@ const start = async () => {
   // NOTE: Is this correct? https://github.com/graphql/express-graphql/issues/14
   app.use('/graphql', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, email');
     // console.log(req);
     if (req.method === 'OPTIONS') {
       res.sendStatus(200);
