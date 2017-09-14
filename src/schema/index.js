@@ -124,6 +124,49 @@ input ActionInput {
   snoozeDate: String
 }
 
+input ActionAttrsInput {
+  title: String
+  description: String
+  workspace: String
+  status: String
+  attachments: [AttachmentsInput]
+  assignees: [String]
+  labels: [String]
+  checked: Boolean
+  deleted: Boolean
+  formAction: String
+  checkedDate: String
+  createdAt: String
+  rank: Float
+  scheduledDate: String
+  deadline: String
+  parent: String
+  root: String
+  privacy: String
+  processId: String
+  projectId: String
+  readBy: [String]
+  urgent: Boolean
+  hasComments: Boolean
+  hasSubactions: Boolean
+  allSubactions: Int
+  checkedSubactions: Int
+  lastMessage: String
+  messageId: String
+  assignedBy: String
+  completedBy: String
+  recurringId: String
+  isRecurringVisible: Boolean
+  bucket: String
+  newAction: Boolean
+  archived: Boolean
+  hasHistory: Boolean
+  modifiedAt: String
+  createdBy: String
+  modifiedBy: String
+  snoozeDate: String
+}
+
 type Query {
   actionList(name: String!, viewId: String, workspace: String!, filters: ActionListFilter, limit: Int, skip: Int): ActionList!
 }
@@ -141,6 +184,10 @@ input ActionListFilter {
 type Mutation {
   insertAction(action: ActionInput): Action!
   updateAction(action: ActionInput): Action!
+  updateActionChildrenChecked(actionId: String!, checked: Boolean!): Boolean
+  updateActionChecked(actionId: String!, checked: Boolean!): Action
+  updateActionTitle(actionId: String!, title: String!): Action
+  updateActionChildren(actionId: String!, attrs: ActionAttrsInput!): Action
 }
 
 enum _ModelMutationType {

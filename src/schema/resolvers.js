@@ -1,6 +1,7 @@
-import pubsub from '../pubsub';
+import _ from 'lodash';
 import { assertUserPermission } from '../utils/validation';
-import { globalRank, transformStringAttrsToDates } from '../utils/helpers';
+import { globalRank, transformStringAttrsToDates, getPrivacyClause } from '../utils/helpers';
+import ancestorAttributes from '../utils/ancestor-attributes';
 
 module.exports = {
   Query: {
@@ -80,6 +81,119 @@ module.exports = {
 
       await Actions.update({ _id }, { $set });
       return await Actions.findOne({ _id });
+    },
+    updateActionChildren: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
+      const _id = data.actionId;
+      const action = await Actions.findOne({ _id });
+      if (!action) return;
+
+      await assertUserPermission(action.workspace, user._id, Workspaces);
+
+      const attrs = transformStringAttrsToDates(data.attrs);
+      attrs.modifiedAt = new Date();
+      attrs.modifiedBy = user._id;
+      const $set = attrs;
+
+      await Actions.update({ _id }, { $set }, { multi: true });
+      return await Actions.findOne({ _id });
+    },
+    updateActionChecked: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
+      const _id = data.actionId;
+      const action = await Actions.findOne({ _id });
+      if (!action) return;
+      const workspace = action.workspace;
+      await assertUserPermission(workspace, user._id, Workspaces);
+
+      const $set = {};
+      if (data.checked) {
+        $set.status = 'Completed';
+        $set.checkedDate = new Date();
+      } else {
+        $set.status = 'Unstarted';
+        $set.checkedDate = null;
+      }
+
+      $set.checked = data.checked;
+      $set.modifiedAt = new Date();
+      $set.modifiedBy = user._id;
+
+      await Actions.update({ _id }, { $set });
+      return await Actions.findOne({ _id });
+    },
+    updateActionTitle: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
+      const _id = data.actionId;
+      const action = await Actions.findOne({ _id });
+      if (!action) return;
+      const workspace = action.workspace;
+      await assertUserPermission(workspace, user._id, Workspaces);
+
+      const $set = {};
+
+      $set.title = data.title;
+      $set.modifiedAt = new Date();
+      $set.modifiedBy = user._id;
+
+      await Actions.update({ _id }, { $set });
+
+      ancestorAttributes.updateTitleById(action, data.title);
+      return await Actions.findOne({ _id });
+    },
+    updateActionChildrenChecked: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
+      const actionId = data.actionId;
+      const action = await Actions.findOne({ _id: actionId });
+      if (!action) return;
+      const workspace = action.workspace;
+      await assertUserPermission(action.workspace, user._id, Workspaces);
+
+      const $set = {};
+      if (data.checked) {
+        $set.status = 'Completed';
+        $set.checkedDate = new Date();
+      } else {
+        $set.status = 'Unstarted';
+        $set.checkedDate = null;
+      }
+
+      $set.checked = data.checked;
+      $set.modifiedAt = new Date();
+      $set.modifiedBy = user._id;
+      const query = {
+        deleted: false,
+        workspace,
+        $or: getPrivacyClause(user._id),
+      };
+
+      if (!action.root) {
+        query.root = actionId;
+      } else {
+        let subactionIds = await Actions.find(
+          { root: action.root, ancestorAttributes: { $elemMatch: { id: actionId } } },
+          { fields: { _id: 1 } }).toArray();
+
+        if (!subactionIds.length) return false;
+
+        subactionIds = subactionIds.map(a => a._id);
+        query._id = { $in: subactionIds };
+      }
+
+      await Actions.updateMany(query, { $set });
+
+      ancestorAttributes.updateStatusByQuery(query, $set.status);
+
+      // update parent subactions count
+      Actions.find(query).toArray((err, docs) => {
+        const parents = _.groupBy(docs, 'parent');
+        Object.keys(parents).forEach((parent) => {
+          const $setParent = {};
+          const allSubactions = parents[parent];
+          $setParent.allSubactions = allSubactions.length;
+          $setParent.checkedSubactions = allSubactions.filter(a => a.checked).length;
+
+          Actions.update({ _id: parent }, { $set: $setParent });
+        });
+      });
+
+      return true;
     },
   },
   Action: {
