@@ -22,7 +22,7 @@ const start = async () => {
   app.use(morgan('dev'));
 
   // Set up shared context
-  const buildOptions = async (req, res) => {
+  const buildOptions = async (req) => {
     // Get the current user for the context
     const user = await getUserForContext(req.headers, mongo.Users);
     if (!user) {
