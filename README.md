@@ -12,9 +12,9 @@ This is a proof of concept built off of an earlier example application using [ap
 
 ## Short term objectives
 - [x] Default to open source
-- [ ] Recreate query for "My actions" view in GraphQL
-- [ ] Connect Meteor front-end to GraphQL server back-end for **loading data** into "My actions" view
-- [ ] Connect Meteor front-end to GraphQL server back-end for **mutating data** with optimistic UI on "My actions" view
+- [x] Recreate query for "My actions" view in GraphQL
+- [x] Connect Meteor front-end to GraphQL server back-end for **loading data** into "My actions" view
+- [x] Connect Meteor front-end to GraphQL server back-end for **mutating data** with optimistic UI on "My actions" view
 
 ## Long term objectives
 - [ ] Make API public
@@ -22,14 +22,14 @@ This is a proof of concept built off of an earlier example application using [ap
 
 ## High level setup
 - [x] Basic Meteor authentication based on localStorage token
-- [ ] Add linter
+- [x] Add linter
 - [ ] Add basic tests
 - [ ] Migrate select collections
-- [ ] Authorization (node-based, not edge-based) based on user. [See this](https://dev-blog.apollodata.com/auth-in-graphql-part-2-c6441bcc4302) and [this](http://graphql.org/learn/authorization/) for explanation. Finally, there are some good examples/descriptions around separating business layer logic [in this post.](https://medium.com/@simontucker/building-chatty-part-7-authentication-in-graphql-cd37770e5ab3)
+- [x] Authorization (node-based, not edge-based) based on user. [See this](https://dev-blog.apollodata.com/auth-in-graphql-part-2-c6441bcc4302) and [this](http://graphql.org/learn/authorization/) for explanation. Finally, there are some good examples/descriptions around separating business layer logic [in this post.](https://medium.com/@simontucker/building-chatty-part-7-authentication-in-graphql-cd37770e5ab3)
 - [ ] Decide on how to split resolvers and schema into separate files
 - [ ] Deployment strategy
-- [ ] Figure out client-side client config
-- [ ] Figure out Support Mode
+- [x] Figure out client-side client config
+- [x] Figure out Support Mode
 - [ ] Add stress tests/benchmarking
 - [ ] Set up a screen share learning session for whole team
 
