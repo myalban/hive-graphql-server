@@ -1,7 +1,6 @@
 /* eslint-disable import/no-mutable-exports */
 import { MongoClient, Logger } from 'mongodb';
 
-// const MONGO_URL = 'mongodb://localhost:27017/hackernews';
 const METEOR_MONGO_URL = 'mongodb://localhost:3001/meteor';
 export let Actions = {};
 
@@ -13,6 +12,7 @@ export default async function () {
     let logCount = 0;
     Logger.setCurrentLogger((msg, state) => {
       console.log(`MONGO DB REQUEST ${++logCount}`);
+      console.log(msg);
     });
     Logger.setLevel('debug');
     Logger.filter('class', ['Cursor']);
