@@ -1,12 +1,12 @@
+/* eslint-disable import/no-mutable-exports */
 import { MongoClient, Logger } from 'mongodb';
 
 // const MONGO_URL = 'mongodb://localhost:27017/hackernews';
 const METEOR_MONGO_URL = 'mongodb://localhost:3001/meteor';
+export let Actions = {};
 
-module.exports = async () => {
-  // const db = await MongoClient.connect(MONGO_URL);
+export default async function () {
   const meteorDb = await MongoClient.connect(METEOR_MONGO_URL);
-
   // Allows us to log total requests. Useful
   // for making sure queries use data loaders.
   if (process.env.LOG_MONGO) {
@@ -18,11 +18,13 @@ module.exports = async () => {
     Logger.filter('class', ['Cursor']);
   }
 
-  return {
-    // Use Meteor DB for some collections (eventually all)
-    Actions: meteorDb.collection('actions'),
+  Actions = meteorDb.collection('actions');
+  const collections = {
+    Actions,
     ActionViews: meteorDb.collection('actionViews'),
     Workspaces: meteorDb.collection('workspaces'),
     Users: meteorDb.collection('users'),
   };
-};
+
+  return collections;
+}
