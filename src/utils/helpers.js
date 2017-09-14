@@ -83,3 +83,8 @@ export function transformStringAttrsToDates(action) {
 
   return action;
 }
+
+export const getPrivacyClause = userId => [
+  { privacy: 'public' },
+  { privacy: 'private', assignees: userId },
+];
