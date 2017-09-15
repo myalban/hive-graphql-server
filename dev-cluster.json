@@ -1,0 +1,17 @@
+{
+    "apps": [
+        {
+            "name": "hive-graphql",
+            "script": "./build/index.js",
+            "merge_logs": true,
+            "max_restarts": 20,
+            "instances": 4,
+            "max_memory_restart": "200M",
+            "env": {
+                "MONGOURL": "mongodb://localhost:3001/meteor",
+                "PORT": 3030,
+                "NODE_ENV": "dev"
+            }
+        }
+    ]
+}
