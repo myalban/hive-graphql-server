@@ -2,8 +2,12 @@
 1. Clone the repository
 2. Run `npm install`
 3. Start your local Hive meteor application (we need the database running)
-4. [Temporary] Start a local mongo instance by running `mongod`
-5. Start the express server by running `npm start`
+4. Start the express server by running `npm run start`
+
+## Docker (Tentative)
+1. Install docker
+1. Run `docker build -t graphql --build-arg ssh_prv_key="$(cat ~/.ssh/id_rsa)" --build-arg ssh_pub_key="$(cat ~/.ssh/id_rsa.pub)" .`
+2. Run `docker run -p 3030:3030 graphql`
 
 # Overview
 This is a proof of concept built off of an earlier example application using [apollo-server-express](https://github.com/apollographql/apollo-server). It has a few sample resolvers from the [Hacker News example it's stemmed off of](https://www.howtographql.com/graphql-js/1-getting-started/). If you're not familiar with GraphQL + Express, I would take 2-3 hours to run through that tutorial - it will help you reason about this server better.
