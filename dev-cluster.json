@@ -8,7 +8,7 @@
             "instances": 4,
             "max_memory_restart": "200M",
             "env": {
-                "MONGOURL": "mongodb://localhost:3001/meteor",
+                "MONGO_URL": "mongodb://localhost:3001/meteor",
                 "PORT": 3030,
                 "NODE_ENV": "dev"
             }

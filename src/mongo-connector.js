@@ -1,7 +1,7 @@
 /* eslint-disable import/no-mutable-exports */
 import { MongoClient, Logger } from 'mongodb';
 
-const METEOR_MONGO_URL = process.env.MONGOURL;
+const METEOR_MONGO_URL = process.env.MONGO_URL;
 
 export let Actions = {};
 
