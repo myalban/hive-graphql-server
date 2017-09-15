@@ -1,7 +1,8 @@
 /* eslint-disable import/no-mutable-exports */
 import { MongoClient, Logger } from 'mongodb';
 
-const METEOR_MONGO_URL = 'mongodb://localhost:3001/meteor';
+const METEOR_MONGO_URL = process.env.MONGOURL;
+
 export let Actions = {};
 
 export default async function () {

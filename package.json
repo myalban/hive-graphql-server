@@ -7,6 +7,11 @@
     "compile": "babel -d ./build ./src -s",
     "build": "npm run clean && npm run compile",
     "start": "node ./build/index.js",
+    "pm2": "npm run build && pm2 start dev-cluster.json",
+    "pm2-restart": "pm2 restart all",
+    "pm2-stop": "pm2 stop all",
+    "pm2-delete": "npm run pm2-stop && pm2 delete all",
+    "pm2-monit": "pm2 monit",
     "clean": "rm -rf build && mkdir build",
     "dev": "nodemon src/index.js --exec babel-node",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -26,10 +31,12 @@
     "lodash": "^4.17.4",
     "mongodb": "^2.2.31",
     "morgan": "^1.8.2",
+    "pm2": "^2.6.1",
     "subscriptions-transport-ws": "^0.8.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "eslint": "^4.5.0",
