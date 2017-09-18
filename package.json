@@ -9,7 +9,7 @@
     "start": "node ./build/index.js",
     "staging": "npm run build && pm2 start ./node_modules/hive-graphql-env/staging.json",
     "pm2-dev": "npm run build && pm2 start dev-cluster.json",
-    "pm2-restart": "pm2 restart all",
+    "pm2-restart": "npm run build && pm2 restart all",
     "pm2-stop": "pm2 stop all",
     "pm2-delete": "npm run pm2-stop && pm2 delete all",
     "pm2-monit": "pm2 monit",

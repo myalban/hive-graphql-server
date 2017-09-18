@@ -1,4 +1,5 @@
 import 'babel-polyfill';
+import pm2 from 'pm2';
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
@@ -12,7 +13,6 @@ import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
-import pm2 from 'pm2';
 
 const PORT = process.env.PORT || 3030;
 
@@ -72,6 +72,7 @@ const start = async () => {
       return res.sendStatus(500);
     });
   });
+
   // Set up Graphql endpoint and middleware
   app.use('/graphql', bodyParser.json(), graphqlExpress(buildOptions));
 
