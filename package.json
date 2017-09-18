@@ -7,7 +7,6 @@
     "compile": "babel -d ./build ./src -s",
     "build": "npm run clean && npm run compile",
     "start": "npm run build && node ./build/index.js",
-    "test-env": "npm run build && MONGO_URL=\"mongodb://localhost:3001/meteor\" node ./build/index.js",
     "staging": "npm run build && pm2 start ./node_modules/hive-graphql-env/staging.json",
     "pm2-dev": "npm run build && pm2 start dev-cluster.json",
     "pm2-restart": "npm run build && pm2 restart all",

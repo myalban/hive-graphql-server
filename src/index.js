@@ -61,13 +61,17 @@ const start = async () => {
 
   // basic health check
   app.use('/healthcheck', (req, res) => {
-    console.log('healthcheck');
+    let ok = false;
     pm2.list((err, results) => {
       results.forEach((instance) => {
         if (instance.pm2_env.status === 'online') {
-          return res.sendStatus(200);
+          ok = true;
         }
       });
+
+      if (ok) {
+        return res.sendStatus(200);
+      }
 
       return res.sendStatus(500);
     });
