@@ -12,6 +12,7 @@ import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
+import pm2 from 'pm2';
 
 const PORT = process.env.PORT || 3030;
 
@@ -56,6 +57,20 @@ const start = async () => {
     } else {
       next();
     }
+  });
+
+  // basic health check
+  app.use('/healthcheck', (req, res) => {
+    console.log('healthcheck');
+    pm2.list((err, results) => {
+      results.forEach((instance) => {
+        if (instance.pm2_env.status === 'online') {
+          return res.sendStatus(200);
+        }
+      });
+
+      return res.sendStatus(500);
+    });
   });
   // Set up Graphql endpoint and middleware
   app.use('/graphql', bodyParser.json(), graphqlExpress(buildOptions));
