@@ -29,7 +29,7 @@
     "graphql-subscriptions": "^0.4.4",
     "graphql-tools": "^1.1.0",
     "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#4b626259815b7eb9a9bd4a900eb0aecbc18b8411",
-    "hive-graphql-env": "git+ssh@github.com:hiveteams/hive-graphql-env.git#86f00f6c2f094fc44dbbd71010a20138f59897b4",
+    "hive-graphql-env": "git+ssh@github.com:hiveteams/hive-graphql-env.git#36d9e67b6a7134d394c417e3527b098a3cfaf883",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.31",
     "morgan": "^1.8.2",
