@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 import pm2 from 'pm2';
+import OpticsAgent from 'optics-agent';
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
@@ -38,10 +39,11 @@ const start = async () => {
         // Use data loader instead of direct mongo calls
         // so we cache data across each request.
         dataloaders: buildDataloaders(mongo),
+        opticsContext: OpticsAgent.context(req),
       },
       // Custom error formatting to show `field` if present.
       formatError,
-      schema,
+      schema: OpticsAgent.instrumentSchema(schema),
     };
   };
 
@@ -77,6 +79,7 @@ const start = async () => {
     });
   });
 
+  app.use(OpticsAgent.middleware());
   // Set up Graphql endpoint and middleware
   app.use('/graphql', bodyParser.json(), graphqlExpress(buildOptions));
 
