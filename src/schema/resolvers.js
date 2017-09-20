@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { assertUserPermission } from '../utils/validation';
-import { globalRank, transformStringAttrsToDates, getPrivacyClause } from '../utils/helpers';
+import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification } from '../utils/helpers';
 import ancestorAttributes from '../utils/ancestor-attributes';
 
 module.exports = {
@@ -67,6 +67,7 @@ module.exports = {
       action.rank = await globalRank(Actions, action.workspace);
 
       await Actions.insert(action);
+      createNewNotification(user._id, action, action._id, true);
       return await Actions.findOne({ _id });
     },
     updateAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
@@ -99,9 +100,9 @@ module.exports = {
     },
     updateActionChecked: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
       const _id = data.actionId;
-      const action = await Actions.findOne({ _id });
-      if (!action) return;
-      const workspace = action.workspace;
+      const oldAction = await Actions.findOne({ _id });
+      if (!oldAction) return;
+      const workspace = oldAction.workspace;
       await assertUserPermission(workspace, user._id, Workspaces);
 
       const $set = {};
@@ -118,6 +119,7 @@ module.exports = {
       $set.modifiedBy = user._id;
 
       await Actions.update({ _id }, { $set });
+      createNewNotification(user._id, oldAction, oldAction._id, true);
       return await Actions.findOne({ _id });
     },
     updateActionTitle: async (root, data, { mongo: { Actions, Workspaces }, user }) => {

@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export async function globalRank(Actions, workspace, aboveActionId = '', belowActionId = '', existingActionId = false, sortingBy) {
   // Determine global rank based on workspace, above action, below action and moving action
   // Get above item
@@ -72,6 +74,25 @@ export async function globalRank(Actions, workspace, aboveActionId = '', belowAc
 
   // Nothing lol
   return 1;
+}
+
+export function createNewNotification(userId, oldAction, actionId, newAction = false) {
+  const internalApiUrl = process.env.API_URL || 'http://localhost:3000';
+  const createNotificationApi = `${internalApiUrl}/create-action-notification`;
+  const data = {
+    userId,
+    oldAction,
+  };
+
+  if (newAction) {
+    data.newAction = true;
+    data.actionId = actionId;
+  }
+
+
+  axios.post(createNotificationApi, data).catch((err) => {
+    console.error(err);
+  });
 }
 
 export function transformStringAttrsToDates(action) {

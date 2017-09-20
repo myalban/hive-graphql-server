@@ -21,6 +21,7 @@
   "dependencies": {
     "apollo-errors": "^1.5.0",
     "apollo-server-express": "^1.1.0",
+    "axios": "^0.16.2",
     "body-parser": "^1.17.2",
     "crypto": "^1.0.1",
     "dataloader": "^1.3.0",
@@ -29,7 +30,7 @@
     "graphql-subscriptions": "^0.4.4",
     "graphql-tools": "^1.1.0",
     "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#4b626259815b7eb9a9bd4a900eb0aecbc18b8411",
-    "hive-graphql-env": "git+ssh@github.com:hiveteams/hive-graphql-env.git#b37b1e09384bca3e8cd94d20a65d13ab49c3364f",
+    "hive-graphql-env": "git+ssh@github.com:hiveteams/hive-graphql-env.git#45e051a6f096f813d67ec6ba4e5b81e13375707e",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.31",
     "morgan": "^1.8.2",
