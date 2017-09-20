@@ -26,7 +26,6 @@ const start = async () => {
 
   // Set up shared context
   const buildOptions = async (req) => {
-    console.log(req.headers);
     // Get the current user for the context
     const user = await getUserForContext(req.headers, mongo.Users);
     if (!user) {
