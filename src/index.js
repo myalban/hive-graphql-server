@@ -26,6 +26,7 @@ const start = async () => {
 
   // Set up shared context
   const buildOptions = async (req) => {
+    console.log(req.headers);
     // Get the current user for the context
     const user = await getUserForContext(req.headers, mongo.Users);
     if (!user) {
@@ -51,6 +52,7 @@ const start = async () => {
   // since graphql only allows GET and POST requests.
   // NOTE: Is this correct? https://github.com/graphql/express-graphql/issues/14
   app.use('/graphql', (req, res, next) => {
+    console.log(req);
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, email');
     // console.log(req);
