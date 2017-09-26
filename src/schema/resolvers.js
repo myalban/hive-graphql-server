@@ -9,6 +9,7 @@ module.exports = {
       { mongo: { Actions, Workspaces }, user }) => {
       await assertUserPermission(workspace, user._id, Workspaces);
 
+      const isCompleted = filters.actionType === 'completed';
       console.log(name);
       console.log(workspace);
       console.log(limit);
@@ -29,13 +30,7 @@ module.exports = {
         options.sort = { deadline: -1, rank: 1 };
       }
 
-      if (viewId === 'list') {
-        if (name !== 'Completed') {
-          query.bucket = name;
-        }
-      }
-
-      if (filters.actionType === 'completed') {
+      if (isCompleted) {
         query.checked = true;
         query.checkedDate = { $ne: null };
         options.sort = { checkedDate: -1, rank: 1 };
@@ -49,7 +44,7 @@ module.exports = {
       const cursor = Actions.find(query, options);
       return {
         actions: cursor.toArray(),
-        count: cursor.count(),
+        count: isCompleted ? cursor.count() : null,
       };
     },
   },
