@@ -96,10 +96,10 @@ const start = async () => {
   const server = createServer(app);
   server.listen(PORT, () => {
     // Start WS subscription server
-    SubscriptionServer.create(
-      { execute, subscribe, schema },
-      { server, path: '/subscriptions' },
-    );
+    // SubscriptionServer.create(
+    //   { execute, subscribe, schema },
+    //   { server, path: '/subscriptions' },
+    // );
     console.log(`HN GraphQL server started at http://localhost:${PORT}`);
   });
 };
