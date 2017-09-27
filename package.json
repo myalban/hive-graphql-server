@@ -31,14 +31,16 @@
     "graphql": "^0.10.5",
     "graphql-subscriptions": "^0.4.4",
     "graphql-tools": "^1.1.0",
-    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#4b626259815b7eb9a9bd4a900eb0aecbc18b8411",
-    "hive-graphql-env": "git+ssh@github.com:hiveteams/hive-graphql-env.git#954066a6d1516d6946fa9e69a65ac2c406ba9aab",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.31",
     "morgan": "^1.8.2",
     "optics-agent": "^1.1.6",
     "pm2": "^2.6.1",
     "subscriptions-transport-ws": "^0.8.2"
+  },
+  "optionalDependencies": {
+    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#4b626259815b7eb9a9bd4a900eb0aecbc18b8411",    
+    "hive-graphql-env": "git+ssh@github.com:hiveteams/hive-graphql-env.git#954066a6d1516d6946fa9e69a65ac2c406ba9aab"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
