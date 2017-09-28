@@ -114,7 +114,7 @@ module.exports = {
       $set.modifiedBy = user._id;
 
       await Actions.update({ _id }, { $set });
-      createNewNotification(user._id, oldAction, oldAction._id, true);
+      createNewNotification(user._id, oldAction, oldAction._id, false);
       return await Actions.findOne({ _id });
     },
     updateActionTitle: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
