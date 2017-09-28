@@ -6,9 +6,9 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import { getUserForContext } from 'hive-graphql-auth';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import { execute, subscribe } from 'graphql';
+// import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
-import { SubscriptionServer } from 'subscriptions-transport-ws';
+// import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { NotAuthorized } from './errors/not-authorized';
 import schema from './schema';
 import connectMongo from './mongo-connector';
@@ -100,7 +100,7 @@ const start = async () => {
     //   { execute, subscribe, schema },
     //   { server, path: '/subscriptions' },
     // );
-    console.log(`HN GraphQL server started at http://localhost:${PORT}`);
+    console.log(`Hive GraphQL server started at http://localhost:${PORT}`);
   });
 };
 
