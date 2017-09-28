@@ -6,7 +6,6 @@
   "scripts": {
     "compile": "npm install && babel -d ./build ./src -s",
     "build": "npm run clean && npm run compile",
-    "start": "npm run build && node ./build/index.js",
     "prod": "npm run build && pm2 start ./node_modules/hive-graphql-env/production.json",
     "staging": "npm run build && pm2 start ./node_modules/hive-graphql-env/staging.json",
     "pm2-dev": "npm run build && pm2 start dev-cluster.json",
