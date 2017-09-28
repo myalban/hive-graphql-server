@@ -1,4 +1,5 @@
 import axios from 'axios';
+import _ from 'lodash';
 
 export async function globalRank(Actions, workspace, aboveActionId = '', belowActionId = '', existingActionId = false, sortingBy) {
   // Determine global rank based on workspace, above action, below action and moving action
@@ -109,3 +110,17 @@ export const getPrivacyClause = userId => [
   { privacy: 'public' },
   { privacy: 'private', assignees: userId },
 ];
+
+export function updateParentSubactionCount(Actions, query) {
+  Actions.find(query).toArray((err, docs) => {
+    const parents = _.groupBy(docs, 'parent');
+    Object.keys(parents).forEach((parent) => {
+      const $setParent = {};
+      const allSubactions = parents[parent];
+      $setParent.allSubactions = allSubactions.length;
+      $setParent.checkedSubactions = allSubactions.filter(a => a.checked).length;
+
+      Actions.update({ _id: parent }, { $set: $setParent });
+    });
+  });
+}

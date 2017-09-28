@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { assertUserPermission } from '../utils/validation';
-import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification } from '../utils/helpers';
+import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification, updateParentSubactionCount } from '../utils/helpers';
 import ancestorAttributes from '../utils/ancestor-attributes';
 
 module.exports = {
@@ -114,6 +114,10 @@ module.exports = {
       $set.modifiedBy = user._id;
 
       await Actions.update({ _id }, { $set });
+      // it is subaction, update parent count
+      if (oldAction.parent) {
+        updateParentSubactionCount(Actions, { parent: oldAction.parent });
+      }
       createNewNotification(user._id, oldAction, oldAction._id, false);
       return await Actions.findOne({ _id });
     },
@@ -177,18 +181,7 @@ module.exports = {
 
       ancestorAttributes.updateStatusByQuery(query, $set.status);
 
-      // update parent subactions count
-      Actions.find(query).toArray((err, docs) => {
-        const parents = _.groupBy(docs, 'parent');
-        Object.keys(parents).forEach((parent) => {
-          const $setParent = {};
-          const allSubactions = parents[parent];
-          $setParent.allSubactions = allSubactions.length;
-          $setParent.checkedSubactions = allSubactions.filter(a => a.checked).length;
-
-          Actions.update({ _id: parent }, { $set: $setParent });
-        });
-      });
+      updateParentSubactionCount(Actions, query);
 
       return true;
     },
