@@ -10,7 +10,7 @@ export async function globalRank(Actions, workspace, aboveActionId = '', belowAc
 
   if (existingActionId) {
     // Get existing action
-    existingAction = Actions.findOne(existingActionId);
+    existingAction = await Actions.findOne(existingActionId);
   }
 
   // We check if above action has no deadline, to prevent rank calculation issues
@@ -20,11 +20,11 @@ export async function globalRank(Actions, workspace, aboveActionId = '', belowAc
 
   if (aboveActionId) {
     // Get above action
-    aboveAction = Actions.findOne({ _id: aboveActionId, ...selector });
+    aboveAction = await Actions.findOne({ _id: aboveActionId, ...selector });
   }
   if (belowActionId) {
     // Get below action
-    belowAction = Actions.findOne({ _id: belowActionId, ...selector });
+    belowAction = await Actions.findOne({ _id: belowActionId, ...selector });
   }
 
   // Get lowest ranked action in workspace
@@ -37,12 +37,14 @@ export async function globalRank(Actions, workspace, aboveActionId = '', belowAc
 
   if (aboveAction) {
     // Find next item's rank
-    nextHighestRankedAction = belowAction
-      || await Actions.find({ workspace,
+    if (belowAction) {
+      nextHighestRankedAction = belowAction;
+    } else {
+      nextHighestRankedAction = await Actions.find({ workspace,
         deleted: { $ne: true },
-        rank: { $gt: aboveAction.rank } }, { sort: { rank: 1 }, limit: 1 }).toArray();
+        rank: { $gt: aboveAction.rank } }, { sort: { rank: 1 }, limit: 1 }).toArray()[0];
+    }
 
-    nextHighestRankedAction = nextHighestRankedAction[0];
     if (nextHighestRankedAction) {
       // Determine new rank
       return (aboveAction.rank + nextHighestRankedAction.rank) / 2;
@@ -53,9 +55,8 @@ export async function globalRank(Actions, workspace, aboveActionId = '', belowAc
     // Find item with rank directly lower than below action's rank
     nextLowestRankedAction = await Actions.find({ workspace,
       deleted: { $ne: true },
-      rank: { $lt: belowAction.rank } }, { sort: { rank: -1 }, limit: 1 }).toArray();
+      rank: { $lt: belowAction.rank } }, { sort: { rank: -1 }, limit: 1 }).toArray()[0];
 
-    nextLowestRankedAction = nextLowestRankedAction[0];
     if (nextLowestRankedAction) {
       // Determine new rank
       return (belowAction.rank + nextLowestRankedAction.rank) / 2;

@@ -52,6 +52,7 @@ module.exports = {
     insertAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
       await assertUserPermission(data.action.workspace, user._id, Workspaces);
       const { _id } = data.action;
+      const { aboveActionId, belowActionId } = data;
       const action = transformStringAttrsToDates(data.action);
 
       action.modifiedAt = new Date();
@@ -59,8 +60,7 @@ module.exports = {
       action.createdAt = new Date();
       action.createdBy = user._id;
 
-      action.rank = await globalRank(Actions, action.workspace);
-
+      action.rank = await globalRank(Actions, action.workspace, aboveActionId, belowActionId);
       await Actions.insert(action);
       createNewNotification(user._id, action, action._id, true);
       return await Actions.findOne({ _id });
