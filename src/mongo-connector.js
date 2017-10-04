@@ -25,6 +25,8 @@ export default async function () {
     ActionViews: meteorDb.collection('actionViews'),
     Workspaces: meteorDb.collection('workspaces'),
     Users: meteorDb.collection('users'),
+    Projects: meteorDb.collection('projects'),
+    UserSettings: meteorDb.collection('userSettings'),
   };
 
   return collections;

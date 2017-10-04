@@ -88,7 +88,7 @@ const start = async () => {
     endpointURL: '/graphql',
     // Temporary -- force unsafe token
     passHeader: `
-      'Authorization': 'Bearer meteor-DBfHtUDIIUw4BNFYsmCuBnzsWLZ0b0_WNpgH9K0sAU6',
+      'Authorization': 'Bearer meteor-EpFAnwqCU-tddrPJEwHqOTQwxUnwEnfDrNvLtEzPSnc',
     `,
     subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,
   }));

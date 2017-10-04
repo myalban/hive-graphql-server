@@ -183,7 +183,6 @@ input ActionListFilter {
 
 type Mutation {
   insertAction(action: ActionInput, aboveActionId: String, belowActionId: String): Action!
-  updateAction(action: ActionInput): Action!
   updateActionChildrenChecked(actionId: String!, checked: Boolean!): Boolean
   updateActionChecked(actionId: String!, checked: Boolean!): Action
   updateActionTitle(actionId: String!, title: String!): Action

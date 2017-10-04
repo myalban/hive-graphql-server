@@ -1,51 +1,20 @@
-import _ from 'lodash';
 import { assertUserPermission } from '../utils/validation';
 import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification, updateParentSubactionCount } from '../utils/helpers';
 import ancestorAttributes from '../utils/ancestor-attributes';
+import { myActions, kanbanActions } from './actionlist-helpers';
 
 module.exports = {
   Query: {
     actionList: async (root, { name, viewId, workspace, limit = null, skip = 0, filters = {} },
-      { mongo: { Actions, Workspaces }, user }) => {
+      { mongo: { Actions, Workspaces, ActionViews, Projects, UserSettings }, user }) => {
       await assertUserPermission(workspace, user._id, Workspaces);
-
-      const isCompleted = filters.actionType === 'completed';
-      console.log(name);
-      console.log(workspace);
-      console.log(limit);
-      console.log(skip);
-      console.log(filters);
-
-      const query = {
-        workspace,
-        assignees: user._id,
-        deleted: false,
-        archived: false,
-        isRecurringVisible: { $ne: false },
-        checked: false,
-      };
-
-      const options = { sort: { rank: 1 } };
-      if (filters.sortType === 'deadline') {
-        options.sort = { deadline: -1, rank: 1 };
+      if (viewId === 'list') {
+        return await myActions({ name, viewId, workspace, limit, skip, filters },
+          { mongo: { Actions }, user });
       }
 
-      if (isCompleted) {
-        query.checked = true;
-        query.checkedDate = { $ne: null };
-        options.sort = { checkedDate: -1, rank: 1 };
-      }
-
-      if (limit) {
-        options.limit = limit;
-        options.skip = skip;
-      }
-
-      const cursor = Actions.find(query, options);
-      return {
-        actions: cursor.toArray(),
-        count: isCompleted ? cursor.count() : null,
-      };
+      return await kanbanActions({ name, viewId, workspace, limit, skip, filters },
+        { mongo: { Actions, Workspaces, ActionViews, Projects, UserSettings }, user });
     },
   },
   Mutation: {
@@ -63,19 +32,6 @@ module.exports = {
       action.rank = await globalRank(Actions, action.workspace, aboveActionId, belowActionId);
       await Actions.insert(action);
       createNewNotification(user._id, action, action._id, true);
-      return await Actions.findOne({ _id });
-    },
-    updateAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
-      await assertUserPermission(data.action.workspace, user._id, Workspaces);
-
-      const { _id } = data.action;
-      const action = transformStringAttrsToDates(data.action);
-
-      action.modifiedAt = new Date();
-      action.modifiedBy = user._id;
-      const $set = action;
-
-      await Actions.update({ _id }, { $set });
       return await Actions.findOne({ _id });
     },
     updateActionChildren: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
