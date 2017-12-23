@@ -6,9 +6,9 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import { getUserForContext } from 'hive-graphql-auth';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-// import { execute, subscribe } from 'graphql';
+import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
-// import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { NotAuthorized } from './errors/not-authorized';
 import schema from './schema';
 import connectMongo from './mongo-connector';
@@ -27,7 +27,8 @@ const start = async () => {
   // Set up shared context
   const buildOptions = async (req) => {
     // Get the current user for the context
-    const user = await getUserForContext(req.headers, mongo.Users);
+    // const user = await getUserForContext(req.headers, mongo.Users);
+    const user = {};
     if (!user) {
       throw new NotAuthorized();
     }
@@ -96,10 +97,22 @@ const start = async () => {
   const server = createServer(app);
   server.listen(PORT, () => {
     // Start WS subscription server
-    // SubscriptionServer.create(
-    //   { execute, subscribe, schema },
-    //   { server, path: '/subscriptions' },
-    // );
+    SubscriptionServer.create(
+      {
+        execute,
+        subscribe,
+        schema,
+        onConnect: (connectionParams, webSocket) => {
+          // TODO: Pass auth token from client or GraphiQL
+          if (connectionParams.authToken) {
+            return { user: { id: '123', name: 'Eric' } };
+          }
+          return { user: { id: '123', name: 'Eric' } };
+          // throw new Error('Missing auth token!');
+        },
+      },
+      { server, path: '/subscriptions' },
+    );
     console.log(`Hive GraphQL server started at http://localhost:${PORT}`);
   });
 };

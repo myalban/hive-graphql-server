@@ -1,5 +1,8 @@
 import _ from 'lodash';
+import { withFilter } from 'graphql-subscriptions';
+import pubsub from '../pubsub';
 import { assertUserPermission } from '../utils/validation';
+import { callMethodAtEndpoint } from '../meteor-helpers/method-endpoint';
 import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification, updateParentSubactionCount } from '../utils/helpers';
 import ancestorAttributes from '../utils/ancestor-attributes';
 
@@ -48,7 +51,41 @@ module.exports = {
       };
     },
   },
+  Subscription: {
+    messageAdded: {
+      // asyncIterator w/ workspaceId points to redis channel topic
+      subscribe: (root, args) => pubsub.asyncIterator(`messageAdded.${args.workspaceId}`),
+      // subscribe: withFilter(
+      //   (root, args) => pubsub.asyncIterator(`messageAdded.${args.workspaceId}`),
+      //   (payload, args, { user }) => {
+      //     // const { messagesForGroup: { node } } = payload;
+      //     // const fromThisGroup = node.containerId === args.groupId;
+      //     // const userInGroup = node.members.indexOf(user._id) > -1;
+      //     // return fromThisGroup && userInGroup;
+      //     return true; // TODO: Need to check if message is intended for user
+      //   }),
+    },
+    messageChanged: {
+      // asyncIterator w/ workspaceId points to redis channel topic
+      subscribe: (root, args) => pubsub.asyncIterator(`messageChanged.${args.workspaceId}`),
+    },
+  },
   Mutation: {
+    insertMessage: async (root, { workspace, groupId, body }, context, user) => {
+      const methodArgs = {
+        workspace,
+        containerType: 'group',
+        containerId: groupId,
+        body,
+        mentions: [],
+        attachments: [],
+        automated: false,
+        senderPicture: null,
+        senderFirstName: null,
+      };
+      const message = callMethodAtEndpoint('messages.insert', [methodArgs]);
+      return message;
+    },
     insertAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
       await assertUserPermission(data.action.workspace, user._id, Workspaces);
       const { _id } = data.action;

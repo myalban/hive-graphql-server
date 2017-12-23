@@ -181,6 +181,15 @@ input ActionListFilter {
   sortType: String
 }
 
+type Message {
+  _id: ID!
+  body: String!
+  workspace: String!
+  modifiedAt: String
+  createdBy: String
+  modifiedBy: String
+}
+
 type Mutation {
   insertAction(action: ActionInput, aboveActionId: String, belowActionId: String): Action!
   updateAction(action: ActionInput): Action!
@@ -188,6 +197,12 @@ type Mutation {
   updateActionChecked(actionId: String!, checked: Boolean!): Action
   updateActionTitle(actionId: String!, title: String!): Action
   updateActionChildren(actionId: String!, attrs: ActionAttrsInput!): Action
+  insertMessage(workspace: String!, groupId: String!, body: String!): Message
+}
+
+type Subscription {
+  messageAdded(workspaceId: String!, groupIds: [String]): Message
+  messageChanged(workspaceId: String!, groupIds: [String]): Message
 }
 
 enum _ModelMutationType {
