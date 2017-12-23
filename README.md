@@ -3,8 +3,10 @@
 ## Local Development
 1. Clone the repository
 2. Run `npm install`
-3. Start your local Hive meteor application (we need the database running)
-4. Start the express server by running `npm run dev`
+3. Install Redis if you don't already have it `brew install redis`
+4. Start Redis server `redis-server`
+5. Start your local Hive meteor application (we need the database running)
+6. Start the express server by running `npm run dev`
 
 ## Docker (Tentative)
 1. Install docker
