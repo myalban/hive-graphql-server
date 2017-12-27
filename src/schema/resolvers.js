@@ -50,6 +50,17 @@ module.exports = {
         count: isCompleted ? cursor.count() : null,
       };
     },
+    user: async (root, { _id, email }, { mongo: { Users }, user }) => {
+      console.log(`Getting user email ${email} _id ${_id} as user ${JSON.stringify(user)}`);
+      let query;
+      if (_id) query = { _id };
+      else if (email) query = { 'emails.address': email };
+      return await Users.findOne(query);
+    },
+    group: async (root, { _id }, { mongo: { Groups }, user }) => {
+      console.log(`Getting group ${_id} as user ${JSON.stringify(user)}`);
+      return await Groups.findOne({ _id });
+    },
   },
   Subscription: {
     messageAdded: {
@@ -225,5 +236,43 @@ module.exports = {
   },
   Action: {
     description: ({ description }) => description || '',
+  },
+  Group: {
+    name: async ({ name, members }, data, { mongo: { Groups } }) => {
+      // TODO: Figure out group name resolver
+      return name || 'Unnamed group';
+    },
+    messages: async ({ _id, workspace, members }, data, { mongo: { Messages, Groups } }) => {
+      // TODO: Remove limit
+      // TODO: Only show messages user can access
+      return await Messages.find({ workspace, containerId: _id }).limit(10).toArray();
+    },
+    users: async ({ workspace, members }, data, { mongo: { Users, Groups } }) => {
+      return await Users.find({ _id: { $in: members } }).toArray();
+      // return [];
+    },
+  },
+  Message: {
+    from: async ({ sender, senderFirstName }, data, { mongo: { Users } }) => {
+      return await Users.findOne({ _id: sender });
+    },
+  },
+  User: {
+    email: ({ emails }) => {
+      return emails[0].address;
+    },
+    username: ({ profile, emails }) => {
+      const { firstName, lastName } = profile;
+      const email = emails[0].address;
+      return firstName && lastName ? `${firstName} ${lastName}` : email;
+    },
+    groups: async ({ _id }, data, { mongo: { Groups } }) => {
+      const groups = await Groups.find({
+        members: _id,
+        deleted: { $ne: true },
+        workspace: 'xyz123abcdef', // TODO: Switch to use args
+      }).toArray();
+      return groups;
+    },
   },
 };

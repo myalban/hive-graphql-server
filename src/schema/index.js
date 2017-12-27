@@ -169,6 +169,10 @@ input ActionAttrsInput {
 
 type Query {
   actionList(name: String!, viewId: String, workspace: String!, filters: ActionListFilter, limit: Int, skip: Int): ActionList!
+  # Return a user by their email or id
+  user(email: String, _id: String): User
+  # Return a group by id
+  group(_id: String!): Group
 }
 
 type ActionList {
@@ -185,9 +189,26 @@ type Message {
   _id: ID!
   body: String!
   workspace: String!
+  from: User!
   modifiedAt: String
   createdBy: String
+  createdAt: String
   modifiedBy: String
+}
+
+type Group {
+  _id: ID! # unique id for the group
+  name: String # name of the group
+  users: [User]! # users in the group
+  messages: [Message] # messages sent to the group
+}
+
+type User {
+  _id: ID! # unique id for the user
+  email: String!
+  username: String # This is the name we'll show other users
+  messages: [Message] # messages sent by user
+  groups: [Group] # groups the user belongs to
 }
 
 type Mutation {
