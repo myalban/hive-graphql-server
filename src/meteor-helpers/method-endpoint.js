@@ -1,4 +1,4 @@
-import request from 'request';
+import request from 'request-promise';
 
 export const callMethodAtEndpoint = async (methodName, methodArgs) => {
   const url = 'http://localhost:3000/hvmethods/v1/';
@@ -8,6 +8,5 @@ export const callMethodAtEndpoint = async (methodName, methodArgs) => {
     json: methodArgs,
   };
   const response = await request(options);
-  const result = JSON.parse(response.body)[0];
-  return result;
+  return response.data;
 };
