@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { withFilter } from 'graphql-subscriptions';
 import pubsub from '../pubsub';
+import { limitQuery, applyPagination } from '../utils/pagination-helpers';
 import { assertUserPermission } from '../utils/validation';
 import { callMethodAtEndpoint } from '../meteor-helpers/method-endpoint';
 import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification, updateParentSubactionCount } from '../utils/helpers';
@@ -242,10 +243,23 @@ module.exports = {
       // TODO: Figure out group name resolver
       return name || 'Unnamed group';
     },
-    messages: async ({ _id, workspace, members }, data, { mongo: { Messages, Groups } }) => {
-      // TODO: Remove limit
+    messages: async ({ _id, workspace }, { first, last, before, after, sortField = 'createdAt', sortOrder = 1 }, { mongo: { Messages } }) => {
       // TODO: Only show messages user can access
-      return await Messages.find({ workspace, containerId: _id }).limit(10).toArray();
+      // TODO: Validate input arguments
+      const q = {
+        workspace,
+        containerId: _id,
+      };
+      const cursor = await limitQuery(Messages, { sortField, sortOrder, before, after, q });
+      const pageInfo = await applyPagination(cursor, first, last);
+      const messages = await cursor.toArray();
+      return {
+        edges: messages.map(m => ({
+          node: m,
+          cursor: m._id,
+        })),
+        pageInfo,
+      };
     },
     users: async ({ workspace, members }, data, { mongo: { Users, Groups } }) => {
       return await Users.find({ _id: { $in: members } }).toArray();
