@@ -243,7 +243,7 @@ module.exports = {
       // TODO: Figure out group name resolver
       return name || 'Unnamed group';
     },
-    messages: async ({ _id, workspace }, { first, last, before, after, sortField = 'createdAt', sortOrder = 1 }, { mongo: { Messages } }) => {
+    messages: async ({ _id, workspace }, { first, last, before, after, sortField = 'createdAt', sortOrder = -1 }, { mongo: { Messages } }) => {
       // TODO: Only show messages user can access
       // TODO: Validate input arguments
       const q = {
@@ -287,6 +287,15 @@ module.exports = {
         workspace: 'xyz123abcdef', // TODO: Switch to use args
       }).toArray();
       return groups;
+    },
+    coworkers: async ({ _id }, { workspace }, { mongo: { Workspaces, Users } }) => {
+      const query = { members: _id };
+      if (workspace) {
+        query._id = workspace;
+      }
+      const workspaces = await Workspaces.find(query).toArray();
+      const members = workspaces.reduce((acc, curr) => _.uniq(acc.concat(curr.members)), []);
+      return await Users.find({ _id: { $in: members } }).toArray();
     },
   },
 };
