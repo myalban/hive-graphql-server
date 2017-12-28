@@ -260,13 +260,14 @@ module.exports = {
     description: ({ description }) => description || '',
   },
   Group: {
-    name: async ({ name, members }, data, { mongo: { Groups } }) => {
+    name: async ({ name, oneToOne, members }, data, { mongo: { Groups } }) => {
       // TODO: Figure out group name resolver
-      return name || 'Unnamed group';
+      return oneToOne ? 'DM' : name || 'Unnamed group';
     },
     messages: async ({ _id, workspace }, { first, last, before, after, sortField = 'createdAt', sortOrder = -1 }, { mongo: { Messages } }) => {
       // TODO: Only show messages user can access
       // TODO: Validate input arguments
+      // TODO: Data loaders
       const q = {
         workspace,
         containerId: _id,
