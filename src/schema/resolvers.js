@@ -51,17 +51,13 @@ module.exports = {
         count: isCompleted ? cursor.count() : null,
       };
     },
-    user: async (root, { _id, email }, { mongo: { Users }, user }) => {
-      console.log(`Getting user email ${email} _id ${_id} as user ${JSON.stringify(user)}`);
+    user: async (root, { _id, email }, { mongo: { Users } }) => {
       let query;
       if (_id) query = { _id };
       else if (email) query = { 'emails.address': email };
       return await Users.findOne(query);
     },
-    group: async (root, { _id }, { mongo: { Groups }, user }) => {
-      console.log(`Getting group ${_id} as user ${JSON.stringify(user)}`);
-      return await Groups.findOne({ _id });
-    },
+    group: async (root, { _id }, { mongo: { Groups } }) => await Groups.findOne({ _id }),
   },
   Subscription: {
     messageAdded: {
@@ -83,7 +79,7 @@ module.exports = {
     },
   },
   Mutation: {
-    insertMessage: async (root, { workspace, groupId, body }, context, user) => {
+    insertMessage: async (root, { workspace, groupId, body }, { req }) => {
       const methodArgs = {
         workspace,
         containerType: 'group',
@@ -95,10 +91,10 @@ module.exports = {
         senderPicture: null,
         senderFirstName: null,
       };
-      const message = callMethodAtEndpoint('messages.insert', [methodArgs]);
+      const message = callMethodAtEndpoint('messages.insert', { authorization: req.headers.authorization }, [methodArgs]);
       return message;
     },
-    insertGroup: async (root, { workspace, members, name, oneToOne, projectId }, context, user) => {
+    insertGroup: async (root, { workspace, members, name, oneToOne, projectId }, { req }) => {
       const methodArgs = {
         workspace,
         members,
@@ -106,7 +102,7 @@ module.exports = {
       };
       if (name && !oneToOne) methodArgs.name = name;
       if (projectId) methodArgs.projectId = projectId;
-      const group = callMethodAtEndpoint('groups.insert', [methodArgs]);
+      const group = callMethodAtEndpoint('groups.insert', { authorization: req.headers.authorization }, [methodArgs]);
       return group;
     },
     insertAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {

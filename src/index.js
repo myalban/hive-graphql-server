@@ -27,14 +27,14 @@ const start = async () => {
   // Set up shared context
   const buildOptions = async (req) => {
     // Get the current user for the context
-    // const user = await getUserForContext(req.headers, mongo.Users);
-    const user = {};
+    const user = await getUserForContext(req.headers, mongo.Users);
     if (!user) {
       throw new NotAuthorized();
     }
 
     return {
       context: {
+        req,
         mongo,
         user,
         // Use data loader instead of direct mongo calls
