@@ -235,6 +235,7 @@ type Mutation {
   updateActionTitle(actionId: String!, title: String!): Action
   updateActionChildren(actionId: String!, attrs: ActionAttrsInput!): Action
   insertMessage(workspace: String!, groupId: String!, body: String!): Message
+  insertGroup(workspace: String!, members: [String!]!, name: String, oneToOne: Boolean!, projectId: String): Group
 }
 
 type Subscription {

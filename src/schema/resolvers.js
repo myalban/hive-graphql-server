@@ -98,6 +98,17 @@ module.exports = {
       const message = callMethodAtEndpoint('messages.insert', [methodArgs]);
       return message;
     },
+    insertGroup: async (root, { workspace, members, name, oneToOne, projectId }, context, user) => {
+      const methodArgs = {
+        workspace,
+        members,
+        oneToOne,
+      };
+      if (name && !oneToOne) methodArgs.name = name;
+      if (projectId) methodArgs.projectId = projectId;
+      const group = callMethodAtEndpoint('groups.insert', [methodArgs]);
+      return group;
+    },
     insertAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
       await assertUserPermission(data.action.workspace, user._id, Workspaces);
       const { _id } = data.action;
