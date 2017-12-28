@@ -237,6 +237,8 @@ type Mutation {
   updateActionChildren(actionId: String!, attrs: ActionAttrsInput!): Action
   insertMessage(workspace: String!, groupId: String!, body: String!): Message
   insertGroup(workspace: String!, members: [String!]!, name: String, oneToOne: Boolean!, projectId: String): Group
+  leaveGroup(_id: String!): Group
+  deleteGroup(_id: String!): Group
 }
 
 type Subscription {

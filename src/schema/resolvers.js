@@ -105,6 +105,20 @@ module.exports = {
       const group = callMethodAtEndpoint('groups.insert', { authorization: req.headers.authorization }, [methodArgs]);
       return group;
     },
+    leaveGroup: async (root, { _id }, { req }) => {
+      const methodArgs = {
+        groupId: _id,
+      };
+      const group = callMethodAtEndpoint('groups.leaveGroup', { authorization: req.headers.authorization }, [methodArgs]);
+      return group;
+    },
+    deleteGroup: async (root, { _id }, { req }) => {
+      const methodArgs = {
+        groupId: _id,
+      };
+      const group = callMethodAtEndpoint('groups.delete', { authorization: req.headers.authorization }, [methodArgs]);
+      return group;
+    },
     insertAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
       await assertUserPermission(data.action.workspace, user._id, Workspaces);
       const { _id } = data.action;
