@@ -280,12 +280,15 @@ module.exports = {
       const email = emails[0].address;
       return firstName && lastName ? `${firstName} ${lastName}` : email;
     },
-    groups: async ({ _id }, data, { mongo: { Groups } }) => {
-      const groups = await Groups.find({
+    groups: async ({ _id }, { workspace }, { mongo: { Groups } }) => {
+      const query = {
         members: _id,
         deleted: { $ne: true },
-        workspace: 'xyz123abcdef', // TODO: Switch to use args
-      }).toArray();
+      };
+      if (workspace) {
+        query.workspace = workspace;
+      }
+      const groups = await Groups.find(query).toArray();
       return groups;
     },
     coworkers: async ({ _id }, { workspace }, { mongo: { Workspaces, Users } }) => {

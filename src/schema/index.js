@@ -223,7 +223,7 @@ type User {
   email: String!
   username: String # This is the name we'll show other users
   messages: [Message] # messages sent by user
-  groups: [Group] # groups the user belongs to
+  groups(workspace: ID): [Group] # groups the user belongs to
   coworkers(workspace: ID): [User] # Users this user shares workspace(s) with
 }
 
