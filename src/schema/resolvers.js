@@ -61,9 +61,9 @@ module.exports = {
   },
   Subscription: {
     groupAdded: {
-      // asyncIterator w/ workspaceId points to redis channel topic
+      // asyncIterator w/ workspace points to redis channel topic
       subscribe: withFilter(
-        (root, args) => pubsub.asyncIterator(`groupAdded.${args.workspaceId}`),
+        (root, args) => pubsub.asyncIterator(`groupAdded.${args.workspace}`),
         (payload, args, { user }) => {
           // Only return groups where user is member and not creator.
           const group = payload.groupAdded;
@@ -71,9 +71,9 @@ module.exports = {
         }),
     },
     messageAdded: {
-      // asyncIterator w/ workspaceId points to redis channel topic
+      // asyncIterator w/ workspace points to redis channel topic
       subscribe: withFilter(
-        (root, args) => pubsub.asyncIterator(`messageAdded.${args.workspaceId}`),
+        (root, args) => pubsub.asyncIterator(`messageAdded.${args.workspace}`),
         (payload, { groupIds = [] }, { user }) => {
           // Only return messages in arguments groupIds array + messages not from current user.
           const message = payload.messageAdded;
@@ -81,8 +81,8 @@ module.exports = {
         }),
     },
     messageChanged: {
-      // asyncIterator w/ workspaceId points to redis channel topic
-      subscribe: (root, args) => pubsub.asyncIterator(`messageChanged.${args.workspaceId}`),
+      // asyncIterator w/ workspace points to redis channel topic
+      subscribe: (root, args) => pubsub.asyncIterator(`messageChanged.${args.workspace}`),
     },
   },
   Mutation: {

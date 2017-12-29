@@ -242,9 +242,9 @@ type Mutation {
 }
 
 type Subscription {
-  messageAdded(workspaceId: String!, groupIds: [String]): Message
-  messageChanged(workspaceId: String!, groupIds: [String]): Message
-  groupAdded(workspaceId: String!): Group
+  messageAdded(workspace: String!, groupIds: [String]): Message
+  messageChanged(workspace: String!, groupIds: [String]): Message
+  groupAdded(workspace: String!): Group
 }
 
 enum _ModelMutationType {
