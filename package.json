@@ -44,7 +44,7 @@
     "subscriptions-transport-ws": "^0.9.4"
   },
   "optionalDependencies": {
-    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#4b626259815b7eb9a9bd4a900eb0aecbc18b8411",
+    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#4602167dffdded215f45f78c484f55f226519b67",
     "hive-graphql-env": "git+ssh@github.com:hiveteams/hive-graphql-env.git#954066a6d1516d6946fa9e69a65ac2c406ba9aab"
   },
   "devDependencies": {

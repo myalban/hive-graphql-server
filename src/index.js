@@ -4,18 +4,17 @@ import OpticsAgent from 'optics-agent';
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
-import { getUserForContext } from 'hive-graphql-auth';
+import checkAuth from 'hive-graphql-auth';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
-import checkAuth from './auth';
 import { NotAuthorized } from './errors/not-authorized';
 import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
-import { LOCAL_JWT } from './config';
+import { LOCAL_JWT, JWT_SECRET } from './config';
 
 const PORT = process.env.PORT || 3030;
 
@@ -29,7 +28,7 @@ const start = async () => {
   // Set up shared context
   const buildOptions = async (req) => {
     const authorization = req.headers.authorization;
-    const user = await checkAuth(authorization, mongo.Users);
+    const user = await checkAuth(authorization, { Users: mongo.Users, JWT_SECRET });
     if (!user) {
       throw new NotAuthorized();
     }
@@ -112,9 +111,8 @@ const start = async () => {
           let user;
           // TODO: Pass auth token from client or GraphiQL
           if (authToken) {
-            const full = `Bearer ${useMeteorToken ? 'meteor-' : ''}${authToken}`;
-            // TODO: Change auth package to take non-header argument.
-            user = await getUserForContext({ authorization: full }, mongo.Users);
+            const authHeader = `Bearer ${useMeteorToken ? 'meteor-' : ''}${authToken}`;
+            user = await checkAuth(authHeader, { Users: mongo.Users, JWT_SECRET });
           } else {
             // For now hard code email address for use in GraphiQL
             user = await mongo.Users.findOne({ 'emails.address': 'sillybilly@site.com' });
