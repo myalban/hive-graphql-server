@@ -102,12 +102,18 @@ const start = async () => {
         execute,
         subscribe,
         schema,
-        onConnect: (connectionParams, webSocket) => {
+        onConnect: async ({ authToken }, webSocket) => {
+          let user;
           // TODO: Pass auth token from client or GraphiQL
-          if (connectionParams.authToken) {
-            return { user: { id: '123', name: 'Eric' } };
+          if (authToken) {
+            const full = `Bearer meteor-${authToken}`;
+            // TODO: Change auth package to take non-header argument.
+            user = await getUserForContext({ authorization: full }, mongo.Users);
+          } else {
+            // For now hard code email address for use in GraphiQL
+            user = await mongo.Users.findOne({ 'emails.address': 'sillybilly@site.com' });
           }
-          return { user: { id: '123', name: 'Eric' } };
+          return { user };
           // throw new Error('Missing auth token!');
         },
       },
