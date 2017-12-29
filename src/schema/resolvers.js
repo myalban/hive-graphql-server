@@ -60,6 +60,16 @@ module.exports = {
     group: async (root, { _id }, { mongo: { Groups } }) => await Groups.findOne({ _id }),
   },
   Subscription: {
+    groupAdded: {
+      // asyncIterator w/ workspaceId points to redis channel topic
+      subscribe: withFilter(
+        (root, args) => pubsub.asyncIterator(`groupAdded.${args.workspaceId}`),
+        (payload, args, { user }) => {
+          // Only return groups where user is member and not creator.
+          const group = payload.groupAdded;
+          return group.members.includes(user._id) && user._id !== group.createdBy;
+        }),
+    },
     messageAdded: {
       // asyncIterator w/ workspaceId points to redis channel topic
       subscribe: withFilter(

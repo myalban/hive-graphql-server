@@ -244,6 +244,7 @@ type Mutation {
 type Subscription {
   messageAdded(workspaceId: String!, groupIds: [String]): Message
   messageChanged(workspaceId: String!, groupIds: [String]): Message
+  groupAdded(workspaceId: String!): Group
 }
 
 enum _ModelMutationType {
