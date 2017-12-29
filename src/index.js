@@ -113,7 +113,7 @@ const start = async () => {
             // For now hard code email address for use in GraphiQL
             user = await mongo.Users.findOne({ 'emails.address': 'sillybilly@site.com' });
           }
-          return { user };
+          return { user, mongo };
           // throw new Error('Missing auth token!');
         },
       },
