@@ -98,7 +98,7 @@ module.exports = {
         senderPicture: null,
         senderFirstName: null,
       };
-      const message = callMethodAtEndpoint('messages.insert', { authorization: req.headers.authorization }, [methodArgs]);
+      const message = await callMethodAtEndpoint('messages.insert', { authorization: req.headers.authorization }, [methodArgs]);
       return message;
     },
     insertGroup: async (root, { workspace, members, name, oneToOne, projectId }, { req }) => {
@@ -109,21 +109,21 @@ module.exports = {
       };
       if (name && !oneToOne) methodArgs.name = name;
       if (projectId) methodArgs.projectId = projectId;
-      const group = callMethodAtEndpoint('groups.insert', { authorization: req.headers.authorization }, [methodArgs]);
+      const group = await callMethodAtEndpoint('groups.insert', { authorization: req.headers.authorization }, [methodArgs]);
       return group;
     },
     leaveGroup: async (root, { _id }, { req }) => {
       const methodArgs = {
         groupId: _id,
       };
-      const group = callMethodAtEndpoint('groups.leaveGroup', { authorization: req.headers.authorization }, [methodArgs]);
+      const group = await callMethodAtEndpoint('groups.leaveGroup', { authorization: req.headers.authorization }, [methodArgs]);
       return group;
     },
     deleteGroup: async (root, { _id }, { req }) => {
       const methodArgs = {
         groupId: _id,
       };
-      const group = callMethodAtEndpoint('groups.delete', { authorization: req.headers.authorization }, [methodArgs]);
+      const group = await callMethodAtEndpoint('groups.delete', { authorization: req.headers.authorization }, [methodArgs]);
       return group;
     },
     insertAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
