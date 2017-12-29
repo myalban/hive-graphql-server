@@ -299,6 +299,9 @@ module.exports = {
     from: async ({ sender, senderFirstName }, data, { mongo: { Users } }) => {
       return await Users.findOne({ _id: sender });
     },
+    to: async ({ containerId }, data, { mongo: { Groups } }) => {
+      return await Groups.findOne({ _id: containerId });
+    },
   },
   User: {
     email: ({ emails }) => {

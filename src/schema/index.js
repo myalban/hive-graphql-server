@@ -190,6 +190,7 @@ type Message {
   body: String!
   workspace: String!
   from: User!
+  to: Group!
   modifiedAt: String
   createdBy: String
   createdAt: String
