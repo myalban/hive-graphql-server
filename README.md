@@ -8,6 +8,9 @@
 5. Start your local Hive meteor application (this will start mongo at port 3001)
 6. Start the express server by running `npm run dev`
 
+## Environment variables
+We're using a .env file to capture environment variables. Copy the sample [.env.sample] file and save as `.env` with values filled in.
+
 ## Docker (Tentative)
 1. Install docker
 1. Run `docker build -t graphql --build-arg ssh_prv_key="$(cat ~/.ssh/id_rsa)" --build-arg ssh_pub_key="$(cat ~/.ssh/id_rsa.pub)" .`
@@ -18,6 +21,7 @@ This is a proof of concept built off of an earlier example application using [ap
 
 ## Notes/to-dos
 - Gist has info on setup, merge into here when ready
+- Fake data gen
 - Figure out Date types (string likely won't cut it)
 - Need to maybe support JWT on Express + Meteor boxes so we don't have to re-query for user context every time
 - Need to decide on Express --> Meteor requests and whether they'll forward jwt/meteor token

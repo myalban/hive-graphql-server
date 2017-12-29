@@ -1,6 +1,10 @@
 import _ from 'lodash';
 import { withFilter } from 'graphql-subscriptions';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import SHA256 from '../meteor-helpers/sha256';
 import pubsub from '../pubsub';
+import { JWT_SECRET } from '../config';
 import { limitQuery, applyPagination } from '../utils/pagination-helpers';
 import { assertUserPermission } from '../utils/validation';
 import { callMethodAtEndpoint } from '../meteor-helpers/method-endpoint';
@@ -86,6 +90,32 @@ module.exports = {
     },
   },
   Mutation: {
+    login: async (root, { email, password }, { mongo: { Users }, req, user }) => {
+      // Find user by email
+      // TODO: case insensitive find
+      // TODO: Handle already logged in?
+      const attemptedUser = await Users.findOne({ 'emails.0.address': email });
+      if (attemptedUser) {
+        // Validate password
+        let valid;
+        try {
+          const passwordString = SHA256(password);
+          valid = await bcrypt.compare(passwordString, user.services.password.bcrypt);
+        } catch (invalidPasswordErr) {
+          throw new Error('Invalid email and password combination');
+        }
+        if (valid) {
+          const token = jwt.sign({
+            _id: user._id,
+            email: user.emails[0].address,
+          }, JWT_SECRET);
+          user.jwt = token;
+          return user;
+        }
+        throw new Error('Invalid email and password combination');
+      }
+      throw new Error('Email not found');
+    },
     insertMessage: async (root, { workspace, groupId, body }, { req }) => {
       const methodArgs = {
         workspace,

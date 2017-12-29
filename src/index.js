@@ -9,11 +9,13 @@ import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
+import checkAuth from './auth';
 import { NotAuthorized } from './errors/not-authorized';
 import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
+import { LOCAL_JWT } from './config';
 
 const PORT = process.env.PORT || 3030;
 
@@ -26,8 +28,8 @@ const start = async () => {
 
   // Set up shared context
   const buildOptions = async (req) => {
-    // Get the current user for the context
-    const user = await getUserForContext(req.headers, mongo.Users);
+    const authorization = req.headers.authorization;
+    const user = await checkAuth(authorization, mongo.Users);
     if (!user) {
       throw new NotAuthorized();
     }
@@ -87,10 +89,14 @@ const start = async () => {
   // GraphiQL
   app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql',
-    // Temporary -- force unsafe token
+    // Use tokens from local env for GraphiQL
     passHeader: `
-      'Authorization': 'Bearer meteor-39XkvQPn7RlkUoqxUtB5JXqea_iaA77L6fm9OOk7Iac',
+      'Authorization': 'Bearer ${LOCAL_JWT}',
     `,
+    // If you want to use Meteor token, uncomment below:
+    // passHeader: `
+    //   'Authorization': 'Bearer meteor-${LOCAL_METEOR_TOKEN}',
+    // `,
     subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,
   }));
 
@@ -102,11 +108,11 @@ const start = async () => {
         execute,
         subscribe,
         schema,
-        onConnect: async ({ authToken }, webSocket) => {
+        onConnect: async ({ authToken, useMeteorToken }, webSocket) => {
           let user;
           // TODO: Pass auth token from client or GraphiQL
           if (authToken) {
-            const full = `Bearer meteor-${authToken}`;
+            const full = `Bearer ${useMeteorToken ? 'meteor-' : ''}${authToken}`;
             // TODO: Change auth package to take non-header argument.
             user = await getUserForContext({ authorization: full }, mongo.Users);
           } else {

@@ -222,6 +222,7 @@ type Group {
 
 type User {
   _id: ID! # unique id for the user
+  jwt: String # json web token for access
   email: String!
   username: String # This is the name we'll show other users
   messages: [Message] # messages sent by user
@@ -230,6 +231,7 @@ type User {
 }
 
 type Mutation {
+  login(email: String!, password: String!): User
   insertAction(action: ActionInput, aboveActionId: String, belowActionId: String): Action!
   updateAction(action: ActionInput): Action!
   updateActionChildrenChecked(actionId: String!, checked: Boolean!): Boolean
