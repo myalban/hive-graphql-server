@@ -62,16 +62,13 @@ module.exports = {
   Subscription: {
     messageAdded: {
       // asyncIterator w/ workspaceId points to redis channel topic
-      subscribe: (root, args) => pubsub.asyncIterator(`messageAdded.${args.workspaceId}`),
-      // subscribe: withFilter(
-      //   (root, args) => pubsub.asyncIterator(`messageAdded.${args.workspaceId}`),
-      //   (payload, args, { user }) => {
-      //     // const { messagesForGroup: { node } } = payload;
-      //     // const fromThisGroup = node.containerId === args.groupId;
-      //     // const userInGroup = node.members.indexOf(user._id) > -1;
-      //     // return fromThisGroup && userInGroup;
-      //     return true; // TODO: Need to check if message is intended for user
-      //   }),
+      subscribe: withFilter(
+        (root, args) => pubsub.asyncIterator(`messageAdded.${args.workspaceId}`),
+        (payload, { groupIds = [] }, { user }) => {
+          // Only return messages in arguments groupIds array + messages not from current user.
+          const message = payload.messageAdded;
+          return groupIds.includes(message.containerId) && user._id !== message.createdBy;
+        }),
     },
     messageChanged: {
       // asyncIterator w/ workspaceId points to redis channel topic
