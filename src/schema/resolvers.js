@@ -92,9 +92,9 @@ module.exports = {
   Mutation: {
     login: async (root, { email, password }, { mongo: { Users }, req, user }) => {
       // Find user by email
-      // TODO: case insensitive find
       // TODO: Handle already logged in?
-      const attemptedUser = await Users.findOne({ 'emails.0.address': email });
+      const sentEmailRegex = new RegExp(email, 'i');
+      const attemptedUser = await Users.findOne({ 'emails.0.address': sentEmailRegex });
       if (attemptedUser) {
         // Validate password
         let valid;
@@ -362,5 +362,6 @@ module.exports = {
       const members = workspaces.reduce((acc, curr) => _.uniq(acc.concat(curr.members)), []);
       return await Users.find({ _id: { $in: members } }).toArray();
     },
+    lastWorkspace: ({ profile: { lastWorkspace } }) => lastWorkspace || '',
   },
 };

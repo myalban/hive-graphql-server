@@ -228,6 +228,7 @@ type User {
   messages: [Message] # messages sent by user
   groups(workspace: ID): [Group] # groups the user belongs to
   coworkers(workspace: ID): [User] # Users this user shares workspace(s) with
+  lastWorkspace: String
 }
 
 type Mutation {
