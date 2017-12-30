@@ -28,10 +28,14 @@ const start = async () => {
   // Set up shared context
   const buildOptions = async (req) => {
     const authorization = req.headers.authorization;
-    const user = await checkAuth(authorization, { Users: mongo.Users, JWT_SECRET });
-    if (!user) {
-      throw new NotAuthorized();
+    let user;
+    if (typeof authorization !== 'undefined') {
+      user = await checkAuth(authorization, { Users: mongo.Users, JWT_SECRET });
     }
+    // No auth is okay since users need to log in.
+    // if (!user) {
+    //   throw new NotAuthorized();
+    // }
 
     return {
       context: {

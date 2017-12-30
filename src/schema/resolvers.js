@@ -90,12 +90,12 @@ module.exports = {
     },
   },
   Mutation: {
-    login: async (root, { email, password }, { mongo: { Users }, req, user }) => {
+    login: async (root, { email, password }, { mongo: { Users } }) => {
       // Find user by email
       // TODO: Handle already logged in?
       const sentEmailRegex = new RegExp(email, 'i');
-      const attemptedUser = await Users.findOne({ 'emails.0.address': sentEmailRegex });
-      if (attemptedUser) {
+      const user = await Users.findOne({ 'emails.0.address': sentEmailRegex });
+      if (user) {
         // Validate password
         let valid;
         try {
