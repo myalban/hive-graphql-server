@@ -116,7 +116,7 @@ module.exports = {
       }
       throw new Error('Email not found');
     },
-    insertMessage: async (root, { workspace, groupId, body }, { req }) => {
+    insertMessage: async (root, { workspace, groupId, body }, { user }) => {
       const methodArgs = {
         workspace,
         containerType: 'group',
@@ -128,10 +128,10 @@ module.exports = {
         senderPicture: null,
         senderFirstName: null,
       };
-      const message = await callMethodAtEndpoint('messages.insert', { authorization: req.headers.authorization }, [methodArgs]);
+      const message = await callMethodAtEndpoint('messages.insert', { 'x-userid': user._id }, [methodArgs]);
       return message;
     },
-    insertGroup: async (root, { workspace, members, name, oneToOne, projectId }, { req }) => {
+    insertGroup: async (root, { workspace, members, name, oneToOne, projectId }, { user }) => {
       const methodArgs = {
         workspace,
         members,
@@ -139,21 +139,21 @@ module.exports = {
       };
       if (name && !oneToOne) methodArgs.name = name;
       if (projectId) methodArgs.projectId = projectId;
-      const group = await callMethodAtEndpoint('groups.insert', { authorization: req.headers.authorization }, [methodArgs]);
+      const group = await callMethodAtEndpoint('groups.insert', { 'x-userid': user._id }, [methodArgs]);
       return group;
     },
-    leaveGroup: async (root, { _id }, { req }) => {
+    leaveGroup: async (root, { _id }, { user }) => {
       const methodArgs = {
         groupId: _id,
       };
-      const group = await callMethodAtEndpoint('groups.leaveGroup', { authorization: req.headers.authorization }, [methodArgs]);
+      const group = await callMethodAtEndpoint('groups.leaveGroup', { 'x-userid': user._id }, [methodArgs]);
       return group;
     },
-    deleteGroup: async (root, { _id }, { req }) => {
+    deleteGroup: async (root, { _id }, { user }) => {
       const methodArgs = {
         groupId: _id,
       };
-      const group = await callMethodAtEndpoint('groups.delete', { authorization: req.headers.authorization }, [methodArgs]);
+      const group = await callMethodAtEndpoint('groups.delete', { 'x-userid': user._id }, [methodArgs]);
       return group;
     },
     insertAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
