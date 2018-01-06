@@ -3,8 +3,13 @@
 ## Local Development
 1. Clone the repository
 2. Run `npm install`
-3. Start your local Hive meteor application (we need the database running)
-4. Start the express server by running `npm run dev`
+3. Install Redis if you don't already have it `brew install redis`
+4. Start Redis server `redis-server`
+5. Start your local Hive meteor application (this will start mongo at port 3001)
+6. Start the express server by running `npm run dev`
+
+## Environment variables
+We're using a .env file to capture environment variables. Copy the sample [.env.sample] file and save as `.env` with values filled in.
 
 ## Docker (Tentative)
 1. Install docker
@@ -13,6 +18,18 @@
 
 # Overview
 This is a proof of concept built off of an earlier example application using [apollo-server-express](https://github.com/apollographql/apollo-server). If you're not familiar with GraphQL + Express, I would take 2-3 hours to run through that tutorial - it will help you reason about this server better.
+
+## Notes/to-dos
+- Gist has info on setup, merge into here when ready
+- Fake data gen
+- Figure out Date types (string likely won't cut it)
+- Need to maybe support JWT on Express + Meteor boxes so we don't have to re-query for user context every time
+- Need to decide on Express --> Meteor requests and whether they'll forward jwt/meteor token
+- Need to figure out Redis reconnect (right now express server dies and doesn't recover if redis goes down)
+- Need to figure out Mongo reconnect (need to test, but I think express server craps out if mongo goes down and comes back up)
+- Need to figure out how to call Meteor methods with context so we can say "yes, this method call is triggered by API - please do/don't fire pub sub event".
+- Cross-client subscriptions - currently new messages/new group subscriptions filter out current user to avoid extra fetches, but if I send a message on web and have mobile open, my message won't appear there :-o
+
 
 # Hive GraphQL server roadmap
 

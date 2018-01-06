@@ -24,6 +24,8 @@ export default async function () {
     Actions,
     ActionViews: meteorDb.collection('actionViews'),
     Workspaces: meteorDb.collection('workspaces'),
+    Groups: meteorDb.collection('groups'),
+    Messages: meteorDb.collection('messages'),
     Users: meteorDb.collection('users'),
   };
 

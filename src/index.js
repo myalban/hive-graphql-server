@@ -4,16 +4,17 @@ import OpticsAgent from 'optics-agent';
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
-import { getUserForContext } from 'hive-graphql-auth';
+import checkAuth from 'hive-graphql-auth';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-// import { execute, subscribe } from 'graphql';
+import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
-// import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { NotAuthorized } from './errors/not-authorized';
 import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
+import { LOCAL_JWT, JWT_SECRET } from './config';
 
 const PORT = process.env.PORT || 3030;
 
@@ -26,14 +27,19 @@ const start = async () => {
 
   // Set up shared context
   const buildOptions = async (req) => {
-    // Get the current user for the context
-    const user = await getUserForContext(req.headers, mongo.Users);
-    if (!user) {
-      throw new NotAuthorized();
+    const authorization = req.headers.authorization;
+    let user;
+    if (typeof authorization !== 'undefined') {
+      user = await checkAuth(authorization, { Users: mongo.Users, JWT_SECRET });
     }
+    // No auth is okay since users need to log in.
+    // if (!user) {
+    //   throw new NotAuthorized();
+    // }
 
     return {
       context: {
+        req,
         mongo,
         user,
         // Use data loader instead of direct mongo calls
@@ -86,20 +92,41 @@ const start = async () => {
   // GraphiQL
   app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql',
-    // Temporary -- force unsafe token
+    // Use tokens from local env for GraphiQL
     passHeader: `
-      'Authorization': 'Bearer meteor-DBfHtUDIIUw4BNFYsmCuBnzsWLZ0b0_WNpgH9K0sAU6',
+      'Authorization': 'Bearer ${LOCAL_JWT}',
     `,
+    // If you want to use Meteor token, uncomment below:
+    // passHeader: `
+    //   'Authorization': 'Bearer meteor-${LOCAL_METEOR_TOKEN}',
+    // `,
     subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,
   }));
 
   const server = createServer(app);
   server.listen(PORT, () => {
     // Start WS subscription server
-    // SubscriptionServer.create(
-    //   { execute, subscribe, schema },
-    //   { server, path: '/subscriptions' },
-    // );
+    SubscriptionServer.create(
+      {
+        execute,
+        subscribe,
+        schema,
+        onConnect: async ({ authToken, useMeteorToken }, webSocket) => {
+          let user;
+          // TODO: Pass auth token from client or GraphiQL
+          if (authToken) {
+            const authHeader = `Bearer ${useMeteorToken ? 'meteor-' : ''}${authToken}`;
+            user = await checkAuth(authHeader, { Users: mongo.Users, JWT_SECRET });
+          } else {
+            // For now hard code email address for use in GraphiQL
+            user = await mongo.Users.findOne({ 'emails.address': 'sillybilly@site.com' });
+          }
+          return { user, mongo };
+          // throw new Error('Missing auth token!');
+        },
+      },
+      { server, path: '/subscriptions' },
+    );
     console.log(`Hive GraphQL server started at http://localhost:${PORT}`);
   });
 };

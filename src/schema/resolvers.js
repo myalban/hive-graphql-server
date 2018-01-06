@@ -1,5 +1,13 @@
 import _ from 'lodash';
+import { withFilter } from 'graphql-subscriptions';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import SHA256 from '../meteor-helpers/sha256';
+import pubsub from '../pubsub';
+import { JWT_SECRET } from '../config';
+import { limitQuery, applyPagination } from '../utils/pagination-helpers';
 import { assertUserPermission } from '../utils/validation';
+import { callMethodAtEndpoint } from '../meteor-helpers/method-endpoint';
 import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification, updateParentSubactionCount } from '../utils/helpers';
 import ancestorAttributes from '../utils/ancestor-attributes';
 
@@ -47,8 +55,107 @@ module.exports = {
         count: isCompleted ? cursor.count() : null,
       };
     },
+    user: async (root, { _id, email }, { mongo: { Users } }) => {
+      let query;
+      if (_id) query = { _id };
+      else if (email) query = { 'emails.address': email };
+      return await Users.findOne(query);
+    },
+    group: async (root, { _id }, { mongo: { Groups } }) => await Groups.findOne({ _id }),
+  },
+  Subscription: {
+    groupAdded: {
+      // asyncIterator w/ workspace points to redis channel topic
+      subscribe: withFilter(
+        (root, args) => pubsub.asyncIterator(`groupAdded.${args.workspace}`),
+        (payload, args, { user }) => {
+          // Only return groups where user is member and not creator.
+          const group = payload.groupAdded;
+          return group.members.includes(user._id) && user._id !== group.createdBy;
+        }),
+    },
+    messageAdded: {
+      // asyncIterator w/ workspace points to redis channel topic
+      subscribe: withFilter(
+        (root, args) => pubsub.asyncIterator(`messageAdded.${args.workspace}`),
+        (payload, { groupIds = [] }, { user }) => {
+          // Only return messages in arguments groupIds array + messages not from current user.
+          const message = payload.messageAdded;
+          return groupIds.includes(message.containerId) && user._id !== message.createdBy;
+        }),
+    },
+    messageChanged: {
+      // asyncIterator w/ workspace points to redis channel topic
+      subscribe: (root, args) => pubsub.asyncIterator(`messageChanged.${args.workspace}`),
+    },
   },
   Mutation: {
+    login: async (root, { email, password }, { mongo: { Users } }) => {
+      // Find user by email
+      // TODO: Handle already logged in?
+      const sentEmailRegex = new RegExp(email, 'i');
+      const user = await Users.findOne({ 'emails.0.address': sentEmailRegex });
+      if (user) {
+        // Validate password
+        let valid;
+        try {
+          const passwordString = SHA256(password);
+          valid = await bcrypt.compare(passwordString, user.services.password.bcrypt);
+        } catch (invalidPasswordErr) {
+          throw new Error('Invalid email and password combination');
+        }
+        if (valid) {
+          const token = jwt.sign({
+            _id: user._id,
+            email: user.emails[0].address,
+          }, JWT_SECRET);
+          user.jwt = token;
+          return user;
+        }
+        throw new Error('Invalid email and password combination');
+      }
+      throw new Error('Email not found');
+    },
+    insertMessage: async (root, { workspace, groupId, body }, { user }) => {
+      const methodArgs = {
+        workspace,
+        containerType: 'group',
+        containerId: groupId,
+        body,
+        mentions: [],
+        attachments: [],
+        automated: false,
+        senderPicture: null,
+        senderFirstName: null,
+      };
+      const message = await callMethodAtEndpoint('messages.insert', { 'x-userid': user._id }, [methodArgs]);
+      return message;
+    },
+    insertGroup: async (root, { workspace, members, name, oneToOne, projectId }, { user }) => {
+      const methodArgs = {
+        workspace,
+        members,
+        oneToOne,
+      };
+      if (name && !oneToOne) methodArgs.name = name;
+      if (projectId) methodArgs.projectId = projectId;
+      const group = await callMethodAtEndpoint('groups.insert', { 'x-userid': user._id }, [methodArgs]);
+      return group;
+    },
+    leaveGroup: async (root, { _id }, { user }) => {
+      const methodArgs = {
+        groupId: _id,
+      };
+      const group = await callMethodAtEndpoint('groups.leaveGroup', { 'x-userid': user._id }, [methodArgs]);
+      return group;
+    },
+    deleteGroup: async (root, { _id }, { user }) => {
+      const methodArgs = {
+        groupId: _id,
+      };
+      const group = await callMethodAtEndpoint('groups.delete', { 'x-userid': user._id }, [methodArgs]);
+      return group;
+    },
     insertAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
       await assertUserPermission(data.action.workspace, user._id, Workspaces);
       const { _id } = data.action;
@@ -188,5 +295,73 @@ module.exports = {
   },
   Action: {
     description: ({ description }) => description || '',
+  },
+  Group: {
+    name: async ({ name, oneToOne, members }, data, { mongo: { Groups } }) => {
+      // TODO: Figure out group name resolver
+      return oneToOne ? 'DM' : name || 'Unnamed group';
+    },
+    messages: async ({ _id, workspace }, { first, last, before, after, sortField = 'createdAt', sortOrder = -1 }, { mongo: { Messages } }) => {
+      // TODO: Only show messages user can access
+      // TODO: Validate input arguments
+      // TODO: Data loaders
+      const q = {
+        workspace,
+        containerId: _id,
+      };
+      const cursor = await limitQuery(Messages, { sortField, sortOrder, before, after, q });
+      const pageInfo = await applyPagination(cursor, first, last);
+      const messages = await cursor.toArray();
+      return {
+        edges: messages.map(m => ({
+          node: m,
+          cursor: m._id,
+        })),
+        pageInfo,
+      };
+    },
+    users: async ({ workspace, members }, data, { mongo: { Users, Groups } }) => {
+      return await Users.find({ _id: { $in: members } }).toArray();
+      // return [];
+    },
+  },
+  Message: {
+    from: async ({ sender, senderFirstName }, data, { mongo: { Users } }) => {
+      return await Users.findOne({ _id: sender });
+    },
+    to: async ({ containerId }, data, { mongo: { Groups } }) => {
+      return await Groups.findOne({ _id: containerId });
+    },
+  },
+  User: {
+    email: ({ emails }) => {
+      return emails[0].address;
+    },
+    username: ({ profile, emails }) => {
+      const { firstName, lastName } = profile;
+      const email = emails[0].address;
+      return firstName && lastName ? `${firstName} ${lastName}` : email;
+    },
+    groups: async ({ _id }, { workspace }, { mongo: { Groups } }) => {
+      const query = {
+        members: _id,
+        deleted: { $ne: true },
+      };
+      if (workspace) {
+        query.workspace = workspace;
+      }
+      const groups = await Groups.find(query).toArray();
+      return groups;
+    },
+    coworkers: async ({ _id }, { workspace }, { mongo: { Workspaces, Users } }) => {
+      const query = { members: _id };
+      if (workspace) {
+        query._id = workspace;
+      }
+      const workspaces = await Workspaces.find(query).toArray();
+      const members = workspaces.reduce((acc, curr) => _.uniq(acc.concat(curr.members)), []);
+      return await Users.find({ _id: { $in: members } }).toArray();
+    },
+    lastWorkspace: ({ profile: { lastWorkspace } }) => lastWorkspace || '',
   },
 };

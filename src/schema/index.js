@@ -169,6 +169,10 @@ input ActionAttrsInput {
 
 type Query {
   actionList(name: String!, viewId: String, workspace: String!, filters: ActionListFilter, limit: Int, skip: Int): ActionList!
+  # Return a user by their email or id
+  user(email: String, _id: String): User
+  # Return a group by id
+  group(_id: String!): Group
 }
 
 type ActionList {
@@ -181,13 +185,70 @@ input ActionListFilter {
   sortType: String
 }
 
+type Message {
+  _id: ID!
+  body: String!
+  workspace: String!
+  from: User!
+  to: Group!
+  modifiedAt: String
+  createdBy: String
+  createdAt: String
+  modifiedBy: String
+}
+
+type MessageConnection {
+  edges: [MessageEdge]
+  pageInfo: PageInfo!
+}
+
+type MessageEdge {
+  cursor: String!
+  node: Message!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type Group {
+  _id: ID! # unique id for the group
+  workspace: String!
+  name: String # name of the group
+  users: [User]! # users in the group
+  messages(first: Int, after: String, last: Int, before: String, sortField: String, sortOrder: Int): MessageConnection
+}
+
+type User {
+  _id: ID! # unique id for the user
+  jwt: String # json web token for access
+  email: String!
+  username: String # This is the name we'll show other users
+  messages: [Message] # messages sent by user
+  groups(workspace: ID): [Group] # groups the user belongs to
+  coworkers(workspace: ID): [User] # Users this user shares workspace(s) with
+  lastWorkspace: String
+}
+
 type Mutation {
+  login(email: String!, password: String!): User
   insertAction(action: ActionInput, aboveActionId: String, belowActionId: String): Action!
   updateAction(action: ActionInput): Action!
   updateActionChildrenChecked(actionId: String!, checked: Boolean!): Boolean
   updateActionChecked(actionId: String!, checked: Boolean!): Action
   updateActionTitle(actionId: String!, title: String!): Action
   updateActionChildren(actionId: String!, attrs: ActionAttrsInput!): Action
+  insertMessage(workspace: String!, groupId: String!, body: String!): Message
+  insertGroup(workspace: String!, members: [String!]!, name: String, oneToOne: Boolean!, projectId: String): Group
+  leaveGroup(_id: String!): Group
+  deleteGroup(_id: String!): Group
+}
+
+type Subscription {
+  messageAdded(workspace: String!, groupIds: [String]): Message
+  messageChanged(workspace: String!, groupIds: [String]): Message
+  groupAdded(workspace: String!): Group
 }
 
 enum _ModelMutationType {
