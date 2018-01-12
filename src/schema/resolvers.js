@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { withFilter } from 'graphql-subscriptions';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import SHA256 from '../meteor-helpers/sha256';
 import pubsub from '../pubsub';
