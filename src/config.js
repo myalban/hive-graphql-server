@@ -6,12 +6,14 @@ export const {
   JWT_SECRET,
   LOCAL_METEOR_TOKEN,
   LOCAL_JWT,
+  LOCAL_METEOR_USER,
 } = process.env;
 
 const defaults = {
   JWT_SECRET: 'some_secret_this_is',
   LOCAL_METEOR_TOKEN: 'ABC.123',
   LOCAL_JWT: 'XYZ.987',
+  LOCAL_METEOR_USER: 'sillybilly@site.com',
 };
 
 Object.keys(defaults).forEach((key) => {

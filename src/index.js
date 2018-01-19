@@ -14,7 +14,7 @@ import schema from './schema';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
-import { LOCAL_JWT, JWT_SECRET } from './config';
+import { LOCAL_JWT, JWT_SECRET, LOCAL_METEOR_USER } from './config';
 
 const PORT = process.env.PORT || 3030;
 
@@ -118,8 +118,8 @@ const start = async () => {
             const authHeader = `Bearer ${useMeteorToken ? 'meteor-' : ''}${authToken}`;
             user = await checkAuth(authHeader, { Users: mongo.Users, JWT_SECRET });
           } else {
-            // For now hard code email address for use in GraphiQL
-            user = await mongo.Users.findOne({ 'emails.address': 'sillybilly@site.com' });
+            // For now use email address from LOCAL_METEOR_USER to act as that user during subscriptions.
+            user = await mongo.Users.findOne({ 'emails.address': LOCAL_METEOR_USER });
           }
           return { user, mongo };
           // throw new Error('Missing auth token!');
