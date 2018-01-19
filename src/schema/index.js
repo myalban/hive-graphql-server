@@ -255,12 +255,19 @@ type Mutation {
   insertGroup(workspace: String!, members: [String!]!, name: String, oneToOne: Boolean!, projectId: String): Group
   leaveGroup(_id: String!): Group
   deleteGroup(_id: String!): Group
+  updateUserStatus(status: UserStatusEnum!): UserStatusEnum
 }
 
 type Subscription {
   messageAdded(workspace: String!, groupIds: [String]): Message
   messageChanged(workspace: String!, groupIds: [String]): Message
   groupAdded(workspace: String!): Group
+}
+
+enum UserStatusEnum {
+  online
+  offline
+  away
 }
 
 enum _ModelMutationType {
