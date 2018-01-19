@@ -223,12 +223,24 @@ type Group {
 type User {
   _id: ID! # unique id for the user
   jwt: String # json web token for access
-  email: String!
-  username: String # This is the name we'll show other users
+  email: String! # user email address
+  firstName: String! # user first name
+  lastName: String! # user last name
+  username: String! # This is the name we'll show other users (actually a users full name)
   messages: [Message] # messages sent by user
   groups(workspace: ID): [Group] # groups the user belongs to
   coworkers(workspace: ID): [User] # Users this user shares workspace(s) with
-  lastWorkspace: String
+  lastWorkspace: String # last workspace accessed by user
+  settings(workspace: ID): UserSettings # settings for this user and this workspace
+  photo: String! # Photo to display for user
+  status: String! # User status ('away', 'offline', 'online')
+}
+
+type UserSettings {
+  _id: ID! # unique id for the user settings
+  userId: ID! # userId these settings belong to
+  workspace: ID! # workspace id these settings belong to
+  hiddenGroups: [Group]! # array of groups to hide
 }
 
 type Mutation {

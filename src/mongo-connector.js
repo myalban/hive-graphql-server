@@ -27,6 +27,7 @@ export default async function () {
     Groups: meteorDb.collection('groups'),
     Messages: meteorDb.collection('messages'),
     Users: meteorDb.collection('users'),
+    UserSettings: meteorDb.collection('userSettings'),
   };
 
   return collections;
