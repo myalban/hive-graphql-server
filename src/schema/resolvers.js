@@ -345,11 +345,38 @@ module.exports = {
     },
   },
   Message: {
+    senderPicture: ({ senderPicture }) => senderPicture || '',
     from: async ({ sender, senderFirstName }, data, { mongo: { Users } }) => {
       return await Users.findOne({ _id: sender });
     },
     to: async ({ containerId }, data, { mongo: { Groups } }) => {
       return await Groups.findOne({ _id: containerId });
+    },
+    files: async ({ attachments }, data, { mongo: { Files } }) => {
+      let files = [];
+      const fileIds = attachments.filter(a => a.attachedItemType === 'file').map(a => a.attachedItemId);
+      if (fileIds.length) {
+        files = await Files.find({ _id: { $in: fileIds }, deleted: false }).toArray();
+      }
+      return files;
+    },
+    mentions: async ({ mentions }, data, { mongo: { Users } }) => {
+      if (mentions.length) {
+        const users = await Users.find({ _id: { $in: mentions } }).toArray();
+        return users;
+      }
+    },
+    reactions: async ({ reactions }, data, { mongo: { Users } }) => {
+      const userIds = reactions.map(r => r.userId);
+      if (userIds.length) {
+        const users = await Users.find({ _id: { $in: userIds } }).toArray();
+        const result = reactions.map(r => ({
+          emoji: r.emoji,
+          userId: r.userId,
+          user: users.find(u => u._id === r.userId),
+        }));
+        return result;
+      }
     },
   },
   User: {

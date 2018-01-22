@@ -76,7 +76,7 @@ type Action {
 }
 
 input AttachmentsInput {
-  id: ID!
+  _id: ID!
   type: String!
 }
 
@@ -185,12 +185,34 @@ input ActionListFilter {
   sortType: String
 }
 
+type File {
+  _id: ID!
+  url: String
+  type: String
+}
+
+type reaction {
+  emoji: String!
+  userId: String!
+  user: User
+}
+
 type Message {
   _id: ID!
   body: String!
   workspace: String!
   from: User!
+  sender: String!
+  containerId: String!
+  senderFirstName: String!
+  senderPicture: String!
+  deleted: Boolean
+  edited: Boolean
+  automated: Boolean
   to: Group!
+  files: [File]
+  reactions: [reaction]
+  mentions: [User]
   modifiedAt: String
   createdBy: String
   createdAt: String
