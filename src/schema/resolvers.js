@@ -311,6 +311,10 @@ module.exports = {
 
       return true;
     },
+    updateUserOnlineStatus: async (root, { status }, { mongo: { Users }, user }) => {
+      await Users.update({ _id: user._id }, { $set: { status } });
+      return await Users.findOne({ _id: user._id });
+    },
   },
   Action: {
     description: ({ description }) => description || '',
@@ -383,6 +387,12 @@ module.exports = {
     email: ({ emails }) => {
       return emails[0].address;
     },
+    firstName: ({ profile }) => {
+      return profile.firstName || '';
+    },
+    lastName: ({ profile }) => {
+      return profile.lastName || '';
+    },
     username: ({ profile, emails }) => {
       const { firstName, lastName } = profile;
       const email = emails[0].address;
@@ -409,5 +419,15 @@ module.exports = {
       return await Users.find({ _id: { $in: members } }).toArray();
     },
     lastWorkspace: ({ profile: { lastWorkspace } }) => lastWorkspace || '',
+    settings: async (root, { workspace }, { mongo: { UserSettings } }) => {
+      const userId = root._id;
+      return await UserSettings.findOne({ userId, workspace });
+    },
+  },
+  UserSettings: {
+    hiddenGroups: async ({ hiddenGroups }, data, { mongo: { Groups } }) => {
+      const groups = await Groups.find({ _id: { $in: hiddenGroups } }).toArray();
+      return groups;
+    },
   },
 };

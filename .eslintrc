@@ -1,7 +1,7 @@
 {
   "extends": "airbnb",
   "globals": {
-  },  
+  },
   "rules": {
     "no-return-await": "off",
     "new-cap": "off",
@@ -20,5 +20,6 @@
     "import/imports-first": "off",
     "import/no-extraneous-dependencies": "off",
     "import/prefer-default-export": "off",
-  },
+    "arrow-body-style": "warn"
+  }
 }
