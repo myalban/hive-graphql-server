@@ -294,7 +294,7 @@ module.exports = {
     },
     updateUserStatus: async (root, { status }, { mongo: { Users }, user }) => {
       await Users.update({ _id: user._id }, { $set: { status } });
-      return status;
+      return await Users.findOne({ _id: user._id });
     },
   },
   Action: {

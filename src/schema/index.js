@@ -255,7 +255,7 @@ type Mutation {
   insertGroup(workspace: String!, members: [String!]!, name: String, oneToOne: Boolean!, projectId: String): Group
   leaveGroup(_id: String!): Group
   deleteGroup(_id: String!): Group
-  updateUserStatus(status: UserStatusEnum!): UserStatusEnum
+  updateUserStatus(status: UserStatusEnum!): User
 }
 
 type Subscription {
