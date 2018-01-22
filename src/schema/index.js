@@ -188,7 +188,9 @@ input ActionListFilter {
 type File {
   _id: ID!
   url: String
-  type: String
+  thumbnail: String
+  fileStore: String # google, dropbox, hive, box
+  type: String # file or directory
 }
 
 type reaction {

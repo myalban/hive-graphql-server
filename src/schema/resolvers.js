@@ -358,9 +358,31 @@ module.exports = {
     },
     files: async ({ attachments }, data, { mongo: { Files } }) => {
       let files = [];
-      const fileIds = attachments.filter(a => a.attachedItemType === 'file').map(a => a.attachedItemId);
+      const fileIds = attachments.filter(a => a.attachedItemType !== 'action').map(a => a.attachedItemId);
+      console.log(fileIds);
       if (fileIds.length) {
-        files = await Files.find({ _id: { $in: fileIds }, deleted: false }).toArray();
+        files = await Files.find({ $or: [{ _id: { $in: fileIds } },
+          { id: { $in: fileIds } }],
+        deleted: false }).toArray();
+
+        files = files.map((f) => {
+          const obj = {
+            _id: f.fileStore === 'dropbox' ? f.id : f._id,
+            name: f.name,
+            fileStore: f.fileStore,
+            type: f.type,
+          };
+
+          if (f.fileStore === 'dropbox') {
+            const pathArr = f.path_lower.split('/');
+            pathArr.splice(pathArr.length - 1, 1);
+            obj.url = `https://dropbox.com/home${pathArr.join('/')}?preview=${f.name}`;
+          } else if (f.fileStore === 'google') {
+            obj.url = f.webViewLink;
+          }
+
+          return obj;
+        });
       }
       return files;
     },
