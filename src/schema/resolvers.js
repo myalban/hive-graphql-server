@@ -292,7 +292,7 @@ module.exports = {
 
       return true;
     },
-    updateUserStatus: async (root, { status }, { mongo: { Users }, user }) => {
+    updateUserOnlineStatus: async (root, { status }, { mongo: { Users }, user }) => {
       await Users.update({ _id: user._id }, { $set: { status } });
       return await Users.findOne({ _id: user._id });
     },
