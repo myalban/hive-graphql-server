@@ -232,7 +232,7 @@ type User {
   coworkers(workspace: ID): [User] # Users this user shares workspace(s) with
   lastWorkspace: String # last workspace accessed by user
   settings(workspace: ID): UserSettings # settings for this user and this workspace
-  photo: String! # Photo to display for user
+  photo: String # Photo to display for user
   status: String! # User status ('away', 'offline', 'online')
 }
 
