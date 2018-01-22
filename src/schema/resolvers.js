@@ -342,10 +342,10 @@ module.exports = {
       return emails[0].address;
     },
     firstName: ({ profile }) => {
-      return profile.firstName;
+      return profile.firstName || '';
     },
     lastName: ({ profile }) => {
-      return profile.lastName;
+      return profile.lastName || '';
     },
     username: ({ profile, emails }) => {
       const { firstName, lastName } = profile;
