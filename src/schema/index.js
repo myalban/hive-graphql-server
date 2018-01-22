@@ -229,10 +229,13 @@ type User {
   groups(workspace: ID): [Group] # groups the user belongs to
   coworkers(workspace: ID): [User] # Users this user shares workspace(s) with
   lastWorkspace: String
+  timezone: String
 }
 
 type Mutation {
   login(email: String!, password: String!): User
+  updateUserLastWorkspace(workspace: String!): User
+  updateUserTimezone(timezone: String!): User
   insertAction(action: ActionInput, aboveActionId: String, belowActionId: String): Action!
   updateAction(action: ActionInput): Action!
   updateActionChildrenChecked(actionId: String!, checked: Boolean!): Boolean

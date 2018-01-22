@@ -156,6 +156,25 @@ module.exports = {
       const group = await callMethodAtEndpoint('groups.delete', { 'x-userid': user._id }, [methodArgs]);
       return group;
     },
+    updateUserTimezone: async (root, { timezone }, { mongo: { Users }, user }) => {
+      await Users.update({ _id: user._id }, { $set: { timezone } });
+      return await Users.findOne({ _id: user._id });
+    },
+    updateUserLastWorkspace: async (root, { workspace }, { mongo: { Users, Workspaces },
+      user }) => {
+      const wkDoc = await Workspaces.findOne({ _id: workspace, members: user._id, deleted: false });
+      if (wkDoc || workspace === '') {
+        await Users.update({ _id: user._id }, {
+          $set: { 'profile.lastWorkspace': workspace },
+          $pull: { 'profile.workspacesVisitTime': { workspaceId: workspace } },
+        });
+        await Users.update({ _id: user._id }, {
+          $addToSet: { 'profile.workspacesVisitTime': { workspaceId: workspace, time: new Date() } },
+        });
+        return await Users.findOne({ _id: user._id });
+      }
+      throw new Error('Invalid workspace');
+    },
     insertAction: async (root, data, { mongo: { Actions, Workspaces }, user }) => {
       await assertUserPermission(data.action.workspace, user._id, Workspaces);
       const { _id } = data.action;
