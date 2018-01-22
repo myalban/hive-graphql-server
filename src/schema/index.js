@@ -234,6 +234,7 @@ type User {
   settings(workspace: ID): UserSettings # settings for this user and this workspace
   photo: String # Photo to display for user
   status: String! # User status ('away', 'offline', 'online')
+  onboardingStage: OnboardingStageEnum! # user stage in onboarding
 }
 
 type UserSettings {
@@ -268,6 +269,15 @@ enum UserStatusEnum {
   online
   offline
   away
+}
+
+enum OnboardingStageEnum {
+  invited
+  info
+  actions
+  teammates
+  files
+  completed
 }
 
 enum _ModelMutationType {
