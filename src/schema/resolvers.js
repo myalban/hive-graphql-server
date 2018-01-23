@@ -344,6 +344,9 @@ module.exports = {
   },
   Message: {
     senderPicture: ({ senderPicture }) => senderPicture || '',
+    deleted: ({ deleted }) => deleted || false,
+    edited: ({ edited }) => edited || false,
+    automated: ({ automated }) => automated || false,
     from: async ({ sender, senderFirstName }, data, { mongo: { Users } }) => {
       return await Users.findOne({ _id: sender });
     },
@@ -372,14 +375,16 @@ module.exports = {
             const pathArr = f.path_lower.split('/');
             pathArr.splice(pathArr.length - 1, 1);
             obj.url = `https://dropbox.com/home${pathArr.join('/')}?preview=${f.name}`;
+            obj.fileStore = 'DROPBOX';
           } else if (f.fileStore === 'google') {
             obj.url = f.webViewLink;
+            obj.fileStore = 'GOOGLE';
             // TODO make sure valid thumbnail exists currently we handle this on the client
             // and if the thumbnail is expired we regenerate it
             obj.thumbnail = f.thumbnailLink;
           } else {
             obj.url = f.url;
-            obj.fileStore = 'hive';
+            obj.fileStore = 'HIVE';
           }
 
           return obj;
@@ -400,6 +405,7 @@ module.exports = {
         const users = await Users.find({ _id: { $in: mentions } }).toArray();
         return users;
       }
+      return [];
     },
     reactions: async ({ reactions }, data, { mongo: { Users } }) => {
       const userIds = reactions.map(r => r.userId);
@@ -412,6 +418,7 @@ module.exports = {
         }));
         return result;
       }
+      return [];
     },
   },
   User: {

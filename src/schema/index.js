@@ -185,15 +185,22 @@ input ActionListFilter {
   sortType: String
 }
 
+enum FileStore {
+  GOOGLE
+  DROPBOX
+  HIVE
+  BOX
+}
+
 type File {
   _id: ID!
-  url: String
+  url: String!
   thumbnail: String
-  fileStore: String # google, dropbox, hive, box
+  fileStore: FileStore!
   type: String # file or directory
 }
 
-type reaction {
+type Reaction {
   emoji: String!
   userId: String!
   user: User
@@ -208,14 +215,14 @@ type Message {
   containerId: String!
   senderFirstName: String!
   senderPicture: String!
-  deleted: Boolean
-  edited: Boolean
-  automated: Boolean
+  deleted: Boolean!
+  edited: Boolean!
+  automated: Boolean!
   to: Group!
-  files: [File]
-  actions: [Action]
-  reactions: [reaction]
-  mentions: [User]
+  files: [File]!
+  actions: [Action]!
+  reactions: [Reaction]!
+  mentions: [User]!
   modifiedAt: String
   createdBy: String
   createdAt: String
