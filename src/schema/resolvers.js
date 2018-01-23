@@ -356,10 +356,11 @@ module.exports = {
     to: async ({ containerId }, data, { mongo: { Groups } }) => {
       return await Groups.findOne({ _id: containerId });
     },
+    // TODO add support to BOX files. Currenty we don't store
+    // them in the DB and subscribe to them on the fly
     files: async ({ attachments }, data, { mongo: { Files } }) => {
       let files = [];
       const fileIds = attachments.filter(a => a.attachedItemType !== 'action').map(a => a.attachedItemId);
-      console.log(fileIds);
       if (fileIds.length) {
         files = await Files.find({ $or: [{ _id: { $in: fileIds } },
           { id: { $in: fileIds } }],
@@ -379,12 +380,26 @@ module.exports = {
             obj.url = `https://dropbox.com/home${pathArr.join('/')}?preview=${f.name}`;
           } else if (f.fileStore === 'google') {
             obj.url = f.webViewLink;
+            // TODO make sure valid thumbnail exists currently we handle this on the client
+            // and if the thumbnail is expired we regenerate it
+            obj.thumbnail = f.thumbnailLink;
+          } else {
+            obj.url = f.url;
+            obj.fileStore = 'hive';
           }
 
           return obj;
         });
       }
       return files;
+    },
+    actions: async ({ attachments }, data, { mongo: { Actions } }) => {
+      let actions = [];
+      const actionIds = attachments.filter(a => a.attachedItemType === 'action').map(a => a.attachedItemId);
+      if (actionIds.length) {
+        actions = await Actions.find({ _id: { $in: actionIds }, deleted: false }).toArray();
+      }
+      return actions;
     },
     mentions: async ({ mentions }, data, { mongo: { Users } }) => {
       if (mentions.length) {

@@ -213,6 +213,7 @@ type Message {
   automated: Boolean
   to: Group!
   files: [File]
+  actions: [Action]
   reactions: [reaction]
   mentions: [User]
   modifiedAt: String
