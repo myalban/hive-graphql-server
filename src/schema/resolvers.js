@@ -355,7 +355,7 @@ module.exports = {
     },
     // TODO add support to BOX files. Currenty we don't store
     // them in the DB and subscribe to them on the fly
-    files: async ({ attachments }, data, { mongo: { Files } }) => {
+    files: async ({ attachments = [] }, data, { mongo: { Files } }) => {
       let files = [];
       const fileIds = attachments.filter(a => a.attachedItemType !== 'action').map(a => a.attachedItemId);
       if (fileIds.length) {
@@ -392,7 +392,7 @@ module.exports = {
       }
       return files;
     },
-    actions: async ({ attachments }, data, { mongo: { Actions } }) => {
+    actions: async ({ attachments = [] }, data, { mongo: { Actions } }) => {
       let actions = [];
       const actionIds = attachments.filter(a => a.attachedItemType === 'action').map(a => a.attachedItemId);
       if (actionIds.length) {
@@ -400,14 +400,14 @@ module.exports = {
       }
       return actions;
     },
-    mentions: async ({ mentions }, data, { mongo: { Users } }) => {
+    mentions: async ({ mentions = [] }, data, { mongo: { Users } }) => {
       if (mentions.length) {
         const users = await Users.find({ _id: { $in: mentions } }).toArray();
         return users;
       }
       return [];
     },
-    reactions: async ({ reactions }, data, { mongo: { Users } }) => {
+    reactions: async ({ reactions = [] }, data, { mongo: { Users } }) => {
       const userIds = reactions.map(r => r.userId);
       if (userIds.length) {
         const users = await Users.find({ _id: { $in: userIds } }).toArray();
