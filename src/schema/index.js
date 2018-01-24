@@ -76,7 +76,7 @@ type Action {
 }
 
 input AttachmentsInput {
-  id: ID!
+  _id: ID!
   type: String!
 }
 
@@ -185,12 +185,44 @@ input ActionListFilter {
   sortType: String
 }
 
+enum FileStore {
+  GOOGLE
+  DROPBOX
+  HIVE
+  BOX
+}
+
+type File {
+  _id: ID!
+  url: String!
+  thumbnail: String
+  fileStore: FileStore!
+  type: String # file or directory
+}
+
+type Reaction {
+  emoji: String!
+  userId: String!
+  user: User
+}
+
 type Message {
   _id: ID!
   body: String!
   workspace: String!
   from: User!
+  sender: String!
+  containerId: String!
+  senderFirstName: String!
+  senderPicture: String!
+  deleted: Boolean!
+  edited: Boolean!
+  automated: Boolean!
   to: Group!
+  files: [File]!
+  actions: [Action]!
+  reactions: [Reaction]!
+  mentions: [User]!
   modifiedAt: String
   createdBy: String
   createdAt: String
@@ -230,6 +262,7 @@ type User {
   messages: [Message] # messages sent by user
   groups(workspace: ID): [Group] # groups the user belongs to
   coworkers(workspace: ID): [User] # Users this user shares workspace(s) with
+  timezone: String
   lastWorkspace: String # last workspace accessed by user
   settings(workspace: ID): UserSettings # settings for this user and this workspace
   photo: String # Photo to display for user
@@ -246,6 +279,8 @@ type UserSettings {
 
 type Mutation {
   login(email: String!, password: String!): User
+  updateUserLastWorkspace(workspace: String!): User
+  updateUserTimezone(timezone: String!): User
   insertAction(action: ActionInput, aboveActionId: String, belowActionId: String): Action!
   updateAction(action: ActionInput): Action!
   updateActionChildrenChecked(actionId: String!, checked: Boolean!): Boolean
