@@ -11,7 +11,7 @@ export default async function () {
   // for making sure queries use data loaders.
   if (process.env.LOG_MONGO) {
     let logCount = 0;
-    Logger.setCurrentLogger((msg, state) => {
+    Logger.setCurrentLogger((msg) => {
       console.log(`MONGO DB REQUEST ${++logCount}`);
       console.log(msg);
     });

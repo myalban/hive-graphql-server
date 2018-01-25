@@ -9,12 +9,16 @@ import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
-import { NotAuthorized } from './errors/not-authorized';
-import schema from './schema';
+import { makeExecutableSchema } from 'graphql-tools';
+// import { NotAuthorized } from './errors/not-authorized';
+import typeDefs from './graphql/typeDefs';
+import resolvers from './graphql/resolvers';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
 import { LOCAL_JWT, JWT_SECRET, LOCAL_METEOR_USER } from './config';
+
+const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const PORT = process.env.PORT || 3030;
 
@@ -111,14 +115,15 @@ const start = async () => {
         execute,
         subscribe,
         schema,
-        onConnect: async ({ authToken, useMeteorToken }, webSocket) => {
+        onConnect: async ({ authToken, useMeteorToken }) => {
           let user;
           // TODO: Pass auth token from client or GraphiQL
           if (authToken) {
             const authHeader = `Bearer ${useMeteorToken ? 'meteor-' : ''}${authToken}`;
             user = await checkAuth(authHeader, { Users: mongo.Users, JWT_SECRET });
           } else {
-            // For now use email address from LOCAL_METEOR_USER to act as that user during subscriptions.
+            // For now use email address from LOCAL_METEOR_USER
+            // to act as that user during subscriptions.
             user = await mongo.Users.findOne({ 'emails.address': LOCAL_METEOR_USER });
           }
           return { user, mongo };
