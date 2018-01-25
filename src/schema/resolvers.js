@@ -337,14 +337,11 @@ module.exports = {
     name: async ({ name, oneToOne, workspace, members }, data,
       { mongo: { Workspaces, Users }, user }) => {
       if (oneToOne) {
-        // exclude myself (requesting userId)
-        const memberWithoutMyself = members.filter(m => m !== user._id);
-        await Users.find({ $and: [{ _id: { $in: members } },
-          { _id: { $ne: user._id } }] }).toArray();
+        const membersWithoutMyself = members.filter(m => m !== user._id);
         const wk = await Workspaces.findOne({ _id: workspace });
         const allWorkspaceMembers = await Users.find({ _id: { $in: wk.members } }).toArray();
-        // temporarly until we cache display name on the user object
-        const dislplayNames = getDisplayNamesForUsers(memberWithoutMyself, allWorkspaceMembers);
+        // Temporary until we cache display name on the user object (data loaders)
+        const dislplayNames = getDisplayNamesForUsers(membersWithoutMyself, allWorkspaceMembers);
 
         return dislplayNames.join(', ');
       }
