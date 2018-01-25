@@ -1,23 +1,28 @@
 
 
-export const getDisplayNamesForUsers = (thisUsers, allWorkspaceUsers) => {
-  const duplicateFirstNameHash = {};
+export const getDisplayNamesForUsers = (members, allWorkspaceUsers) => {
+  const duplicateFirstNames = {};
+  const userNamesMap = {};
 
   allWorkspaceUsers.forEach((u) => {
     const firstName = u.profile.firstName;
-    if (!duplicateFirstNameHash[firstName]) {
-      duplicateFirstNameHash[firstName] = 1;
+    if (!duplicateFirstNames[firstName]) {
+      duplicateFirstNames[firstName] = 1;
     } else {
-      duplicateFirstNameHash[firstName] += 1;
+      duplicateFirstNames[firstName] += 1;
     }
+
+    userNamesMap[u._id] = {
+      firstName: u.profile.firstName || (u.emails.length && u.emails[0].address) || '',
+      fullName: `${u.profile.firstName} ${u.profile.lastName}`,
+    };
   });
 
-  return thisUsers.map((u) => {
-    const name = u.profile.firstName || (u.emails.length && u.emails[0].address) || '';
-    if (duplicateFirstNameHash[name] > 1) {
-      return `${name} ${u.profile.lastName}`;
+  return members.map((id) => {
+    const user = userNamesMap[id];
+    if (duplicateFirstNames[user.firstName] > 1) {
+      return userNamesMap[id].fullName;
     }
-
-    return name;
+    return user.firstName;
   });
 };

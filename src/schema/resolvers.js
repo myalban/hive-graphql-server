@@ -11,7 +11,6 @@ import { callMethodAtEndpoint } from '../meteor-helpers/method-endpoint';
 import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification, updateParentSubactionCount } from '../utils/helpers';
 import ancestorAttributes from '../utils/ancestor-attributes';
 import { getDisplayNamesForUsers } from '../utils/users';
-import { disconnect } from 'cluster';
 
 module.exports = {
   Query: {
@@ -135,19 +134,24 @@ module.exports = {
     },
     insertGroup: async (root, { workspace, members, name, oneToOne, projectId },
       { mongo: { Groups }, user }) => {
-      let group = {};
-
       if (oneToOne) {
-        const dmQuery = { workspace, members: { $all: members }, oneToOne: true };
-        group = await Groups.findOne(dmQuery);
+        const dmQuery = {
+          workspace,
+          members: { $all: members, $size: members.length },
+          oneToOne: true,
+        };
+        const group = await Groups.findOne(dmQuery);
 
-        if (group.deleted) {
-          group.deleted = false;
-          Groups.update(dmQuery, { $set: { deleted: false } });
+        if (group) {
+          if (group.deleted) {
+            group.deleted = false;
+            Groups.update(dmQuery, { $set: { deleted: false } });
+          }
+
+          return group;
         }
-
-        return group;
       }
+
       const methodArgs = {
         workspace,
         members,
@@ -156,8 +160,7 @@ module.exports = {
       if (name && !oneToOne) methodArgs.name = name;
       if (projectId) methodArgs.projectId = projectId;
 
-      group = await callMethodAtEndpoint('groups.insert', { 'x-userid': user._id }, [methodArgs]);
-      return group;
+      return await callMethodAtEndpoint('groups.insert', { 'x-userid': user._id }, [methodArgs]);
     },
     leaveGroup: async (root, { _id }, { user }) => {
       const methodArgs = {
@@ -335,12 +338,13 @@ module.exports = {
       { mongo: { Workspaces, Users }, user }) => {
       if (oneToOne) {
         // exclude myself (requesting userId)
-        const groupUsers = await Users.find({ $and: [{ _id: { $in: members } },
+        const memberWithoutMyself = members.filter(m => m !== user._id);
+        await Users.find({ $and: [{ _id: { $in: members } },
           { _id: { $ne: user._id } }] }).toArray();
         const wk = await Workspaces.findOne({ _id: workspace });
         const allWorkspaceMembers = await Users.find({ _id: { $in: wk.members } }).toArray();
         // temporarly until we cache display name on the user object
-        const dislplayNames = getDisplayNamesForUsers(groupUsers, allWorkspaceMembers);
+        const dislplayNames = getDisplayNamesForUsers(memberWithoutMyself, allWorkspaceMembers);
 
         return dislplayNames.join(', ');
       }
