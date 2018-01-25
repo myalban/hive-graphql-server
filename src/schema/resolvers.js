@@ -10,6 +10,7 @@ import { assertUserPermission } from '../utils/validation';
 import { callMethodAtEndpoint } from '../meteor-helpers/method-endpoint';
 import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification, updateParentSubactionCount } from '../utils/helpers';
 import ancestorAttributes from '../utils/ancestor-attributes';
+import { getDisplayNamesForUsers } from '../utils/users';
 
 module.exports = {
   Query: {
@@ -131,7 +132,26 @@ module.exports = {
       const message = await callMethodAtEndpoint('messages.insert', { 'x-userid': user._id }, [methodArgs]);
       return message;
     },
-    insertGroup: async (root, { workspace, members, name, oneToOne, projectId }, { user }) => {
+    insertGroup: async (root, { workspace, members, name, oneToOne, projectId },
+      { mongo: { Groups }, user }) => {
+      if (oneToOne) {
+        const dmQuery = {
+          workspace,
+          members: { $all: members, $size: members.length },
+          oneToOne: true,
+        };
+        const group = await Groups.findOne(dmQuery);
+
+        if (group) {
+          if (group.deleted) {
+            group.deleted = false;
+            Groups.update(dmQuery, { $set: { deleted: false } });
+          }
+
+          return group;
+        }
+      }
+
       const methodArgs = {
         workspace,
         members,
@@ -139,8 +159,8 @@ module.exports = {
       };
       if (name && !oneToOne) methodArgs.name = name;
       if (projectId) methodArgs.projectId = projectId;
-      const group = await callMethodAtEndpoint('groups.insert', { 'x-userid': user._id }, [methodArgs]);
-      return group;
+
+      return await callMethodAtEndpoint('groups.insert', { 'x-userid': user._id }, [methodArgs]);
     },
     leaveGroup: async (root, { _id }, { user }) => {
       const methodArgs = {
@@ -314,9 +334,19 @@ module.exports = {
     description: ({ description }) => description || '',
   },
   Group: {
-    name: async ({ name, oneToOne, members }, data, { mongo: { Groups } }) => {
-      // TODO: Figure out group name resolver
-      return oneToOne ? 'DM' : name || 'Unnamed group';
+    name: async ({ name, oneToOne, workspace, members }, data,
+      { mongo: { Workspaces, Users }, user }) => {
+      if (oneToOne) {
+        const membersWithoutMyself = members.filter(m => m !== user._id);
+        const wk = await Workspaces.findOne({ _id: workspace });
+        const allWorkspaceMembers = await Users.find({ _id: { $in: wk.members } }).toArray();
+        // Temporary until we cache display name on the user object (data loaders)
+        const dislplayNames = getDisplayNamesForUsers(membersWithoutMyself, allWorkspaceMembers);
+
+        return dislplayNames.join(', ');
+      }
+
+      return name || 'Unnamed group';
     },
     messages: async ({ _id, workspace }, { first, last, before, after, sortField = 'createdAt', sortOrder = -1 }, { mongo: { Messages } }) => {
       // TODO: Only show messages user can access
