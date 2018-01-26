@@ -1,4 +1,30 @@
-export default`
+let Base;
+let Action;
+let File;
+let Group;
+let UserSettings;
+let User;
+
+module.exports = () => [User, Group, UserSettings, File, Action, Base];
+
+Base = require('../base');
+Action = require('../action/schema');
+File = require('../file/schema');
+Group = require('../group/schema');
+UserSettings = require('../user-settings/schema');
+
+User = `
+  extend type Query {
+    user(email: String, _id: String): User
+  }
+
+  extend type Mutation {
+    login(email: String!, password: String!): User
+    updateUserLastWorkspace(workspace: String!): User
+    updateUserTimezone(timezone: String!): User
+    updateUserOnlineStatus(status: UserStatusEnum!): User
+  }
+
   type User {
     _id: ID! # unique id for the user
     jwt: String # json web token for access
@@ -22,7 +48,7 @@ export default`
     offline
     away
   }
-  
+
   enum OnboardingStageEnum {
     invited
     info
@@ -31,22 +57,4 @@ export default`
     files
     completed
   }
-
-  type UserSettings {
-    _id: ID! # unique id for the user settings
-    userId: ID! # userId these settings belong to
-    workspace: ID! # workspace id these settings belong to
-    hiddenGroups: [Group]! # array of groups to hide
-  }
-
-  type Query {
-    user(email: String, _id: String): User
-  }
-
-  type Mutation {
-    login(email: String!, password: String!): User
-    updateUserLastWorkspace(workspace: String!): User
-    updateUserTimezone(timezone: String!): User
-    updateUserOnlineStatus(status: UserStatusEnum!): User
-  }  
 `;

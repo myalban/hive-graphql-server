@@ -1,4 +1,26 @@
-export default`
+let Base;
+let User;
+let Action;
+let File;
+let Message;
+
+module.exports = () => [Message, File, Action, User, Base];
+
+Base = require('../base');
+User = require('../user/schema');
+Action = require('../action/schema');
+File = require('../file/schema');
+
+Message = `
+  extend type Subscription {
+    messageAdded(workspace: String!, groupIds: [String]): Message
+    messageChanged(workspace: String!, groupIds: [String]): Message
+  }
+  
+  extend type Mutation {
+    insertMessage(workspace: String!, groupId: String!, body: String!): Message
+  }
+  
   type Message {
     _id: ID!
     body: String!
@@ -22,21 +44,6 @@ export default`
     modifiedBy: String
   }
 
-  enum FileStore {
-    GOOGLE
-    DROPBOX
-    HIVE
-    BOX
-  }
-  
-  type File {
-    _id: ID!
-    url: String!
-    thumbnail: String
-    fileStore: FileStore!
-    type: String # file or directory
-  }
-
   type Reaction {
     emoji: String!
     userId: String!
@@ -51,19 +58,5 @@ export default`
   type MessageEdge {
     cursor: String!
     node: Message!
-  }
-  
-  type PageInfo {
-    hasNextPage: Boolean!
-    hasPreviousPage: Boolean!
-  }
-
-  type Mutation {
-    insertMessage(workspace: String!, groupId: String!, body: String!): Message
-  }
-  
-  type Subscription {
-    messageAdded(workspace: String!, groupIds: [String]): Message
-    messageChanged(workspace: String!, groupIds: [String]): Message
   }
 `;

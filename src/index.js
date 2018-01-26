@@ -9,16 +9,12 @@ import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
-import { makeExecutableSchema } from 'graphql-tools';
 // import { NotAuthorized } from './errors/not-authorized';
-import typeDefs from './graphql/typeDefs';
-import resolvers from './graphql/resolvers';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
 import { LOCAL_JWT, JWT_SECRET, LOCAL_METEOR_USER } from './config';
-
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+import schema from './schema';
 
 const PORT = process.env.PORT || 3030;
 

@@ -1,4 +1,24 @@
-export default`
+let Base;
+let Action;
+
+module.exports = () => [Action, Base];
+
+Base = require('../base');
+
+Action = `
+  extend type Query {
+    actionList(name: String!, viewId: String, workspace: String!, filters: ActionListFilter, limit: Int, skip: Int): ActionList!
+  }
+
+  extend type Mutation {
+    insertAction(action: ActionInput, aboveActionId: String, belowActionId: String): Action!
+    updateAction(action: ActionInput): Action!
+    updateActionChildrenChecked(actionId: String!, checked: Boolean!): Boolean
+    updateActionChecked(actionId: String!, checked: Boolean!): Action
+    updateActionTitle(actionId: String!, title: String!): Action
+    updateActionChildren(actionId: String!, attrs: ActionAttrsInput!): Action
+  }
+
   type Action {
     _id: ID!
     title: String!
@@ -62,7 +82,7 @@ export default`
     _id: ID!
     type: String!
   }
-  
+
   input ActionInput {
     _id: ID!
     title: String
@@ -106,7 +126,7 @@ export default`
     modifiedBy: String
     snoozeDate: String
   }
-  
+
   input ActionAttrsInput {
     title: String
     description: String
@@ -160,22 +180,9 @@ export default`
     actions: [Action!]!
     count: Int
   }
-  
+
   input ActionListFilter {
     actionType: String
     sortType: String
-  }
-
-  type Query {
-    actionList(name: String!, viewId: String, workspace: String!, filters: ActionListFilter, limit: Int, skip: Int): ActionList!
-  }
-
-  type Mutation {
-    insertAction(action: ActionInput, aboveActionId: String, belowActionId: String): Action!
-    updateAction(action: ActionInput): Action!
-    updateActionChildrenChecked(actionId: String!, checked: Boolean!): Boolean
-    updateActionChecked(actionId: String!, checked: Boolean!): Action
-    updateActionTitle(actionId: String!, title: String!): Action
-    updateActionChildren(actionId: String!, attrs: ActionAttrsInput!): Action
   }
 `;
