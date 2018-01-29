@@ -38,7 +38,7 @@ exports.Mutation = {
     return message;
   },
 
-  deleteMessage: async (root, { messageId }, { user }) => await callMethodAtEndpoint(
+  deleteMessage: async (root, { messageId }, { user }) => callMethodAtEndpoint(
     'messages.delete',
     { 'x-userid': user._id },
     [{ _id: messageId }],
