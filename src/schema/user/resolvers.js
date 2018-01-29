@@ -83,7 +83,7 @@ exports.User = {
     if (workspace) {
       query.workspace = workspace;
     }
-    const groups = await Groups.find(query).toArray();
+    const groups = await Groups.find(query).sort({ lastMessage: -1 }).toArray();
     return groups;
   },
   coworkers: async ({ _id }, { workspace }, { mongo: { Workspaces, Users } }) => {
