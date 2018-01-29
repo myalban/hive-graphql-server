@@ -43,6 +43,17 @@ exports.Mutation = {
     { 'x-userid': user._id },
     [{ _id: messageId }],
   ),
+  addReaction: async (root, { messageId, emoji }, { user }) => {
+    const methodArgs = { messageId, emoji };
+
+    return callMethodAtEndpoint('messages.addReaction', { 'x-userid': user._id }, [methodArgs]);
+  },
+
+  removeReaction: async (root, { messageId, emoji }, { user }) => {
+    const methodArgs = { messageId, emoji };
+
+    return callMethodAtEndpoint('messages.removeReaction', { 'x-userid': user._id }, [methodArgs]);
+  },
 };
 
 exports.Message = {

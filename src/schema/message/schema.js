@@ -21,6 +21,10 @@ Message = `
     insertMessage(workspace: String!, groupId: String!, body: String!): Message
     # Deletes message by id
     deleteMessage(messageId: String!): Int
+    # Add an emoji reaction (like :+1:)  to a Message
+    addReaction(messageId: String!, emoji: String!): Int
+    # Remove user reaction from Message by emoji text (like :+1:)
+    removeReaction(messageId: String!, emoji: String!): Int
   }
   
   type Message {
