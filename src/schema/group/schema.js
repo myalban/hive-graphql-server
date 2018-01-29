@@ -17,6 +17,8 @@ Group = `
 
   extend type Subscription {
     groupAdded(workspace: String!): Group
+    # Tracks changes in workspace groups list
+    groupChanged(workspace: String!): Group
   }
 
   extend type Mutation {
