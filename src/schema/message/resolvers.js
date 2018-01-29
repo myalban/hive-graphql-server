@@ -37,6 +37,18 @@ exports.Mutation = {
     const message = await callMethodAtEndpoint('messages.insert', { 'x-userid': user._id }, [methodArgs]);
     return message;
   },
+
+  addReaction: async (root, { messageId, emoji }, { user }) => {
+    const methodArgs = { messageId, emoji };
+
+    return callMethodAtEndpoint('messages.addReaction', { 'x-userid': user._id }, [methodArgs]);
+  },
+
+  removeReaction: async (root, { messageId, emoji }, { user }) => {
+    const methodArgs = { messageId, emoji };
+
+    return callMethodAtEndpoint('messages.removeReaction', { 'x-userid': user._id }, [methodArgs]);
+  },
 };
 
 exports.Message = {

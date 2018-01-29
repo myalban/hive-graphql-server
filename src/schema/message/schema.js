@@ -19,6 +19,8 @@ Message = `
   
   extend type Mutation {
     insertMessage(workspace: String!, groupId: String!, body: String!): Message
+    addReaction(messageId: String!, emoji: String!): Int
+    removeReaction(messageId: String!, emoji: String!): Int
   }
   
   type Message {
