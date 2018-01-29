@@ -19,7 +19,9 @@ Message = `
   
   extend type Mutation {
     insertMessage(workspace: String!, groupId: String!, body: String!): Message
+    # Add an emoji reaction (like :+1:)  to a Message
     addReaction(messageId: String!, emoji: String!): Int
+    # Remove user reaction from Message by emoji text (like :+1:)
     removeReaction(messageId: String!, emoji: String!): Int
   }
   
