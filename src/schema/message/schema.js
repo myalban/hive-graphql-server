@@ -19,6 +19,8 @@ Message = `
   
   extend type Mutation {
     insertMessage(workspace: String!, groupId: String!, body: String!): Message
+    # Deletes message by id
+    deleteMessage(messageId: String!): Int
   }
   
   type Message {

@@ -37,6 +37,12 @@ exports.Mutation = {
     const message = await callMethodAtEndpoint('messages.insert', { 'x-userid': user._id }, [methodArgs]);
     return message;
   },
+
+  deleteMessage: async (root, { messageId }, { user }) => callMethodAtEndpoint(
+    'messages.delete',
+    { 'x-userid': user._id },
+    [{ _id: messageId }],
+  ),
 };
 
 exports.Message = {
