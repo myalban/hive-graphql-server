@@ -19,6 +19,17 @@ exports.Subscription = {
         return group.members.includes(user._id) && user._id !== group.createdBy;
       }),
   },
+
+  groupChanged: {
+    // asyncIterator w/ workspace points to redis channel topic
+    subscribe: withFilter(
+      (root, args) => pubsub.asyncIterator(`groupAdded.${args.workspace}`),
+      (payload, args, { user }) => {
+        // Only return groups where user is member and not creator.
+        const group = payload.groupChanged;
+        return group.members.includes(user._id) && user._id !== group.createdBy;
+      }),
+  },
 };
 
 exports.Mutation = {
