@@ -17,7 +17,7 @@ Group = `
 
   extend type Subscription {
     groupAdded(workspace: String!): Group
-    # Tracks changes in group
+    # Tracks changes in workspace groups list
     groupChanged(workspace: String!): Group
   }
 
