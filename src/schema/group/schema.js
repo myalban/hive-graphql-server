@@ -25,6 +25,8 @@ Group = `
     insertGroup(workspace: String!, members: [String!]!, name: String, oneToOne: Boolean!, projectId: String): Group
     leaveGroup(_id: String!): Group
     deleteGroup(_id: String!): Group
+    # Update current user group last read time
+    newReadBy(_id: String): Group
   }
 
   type Group {

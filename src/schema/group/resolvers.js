@@ -77,6 +77,12 @@ exports.Mutation = {
     const group = await callMethodAtEndpoint('groups.delete', { 'x-userid': user._id }, [methodArgs]);
     return group;
   },
+
+  newReadBy: async (root, { _id }, { user }) => callMethodAtEndpoint(
+    'groups.newReadBy',
+    { 'x-userid': user._id },
+    [{ groupId: _id }]
+  ),
 };
 
 exports.Group = {
