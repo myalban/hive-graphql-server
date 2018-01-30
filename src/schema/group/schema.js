@@ -35,5 +35,14 @@ Group = `
     name: String # name of the group
     users: [User]! # users in the group
     messages(first: Int, after: String, last: Int, before: String, sortField: String, sortOrder: Int): MessageConnection
+    deleted: Boolean!
+    lastMessage: Message
+    readBy: [ReadBy]!
+    isTyping: [User!]!
+  }
+
+  type ReadBy {
+    user: User!
+    date: Date!
   }
 `;
