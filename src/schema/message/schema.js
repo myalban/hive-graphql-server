@@ -19,6 +19,10 @@ Message = `
   
   extend type Mutation {
     insertMessage(workspace: String!, groupId: String!, body: String!): Message
+    
+    # Edits message details like body, mentions and attachments
+    editMessage(messageId: String!, body: String, mentions: [String]): Message
+    
     # Deletes message by id
     deleteMessage(messageId: String!): Int
     # Add an emoji reaction (like :+1:)  to a Message
