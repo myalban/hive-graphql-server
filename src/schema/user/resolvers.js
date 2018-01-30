@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import SHA256 from '../../meteor-helpers/sha256';
 import { JWT_SECRET } from '../../config';
 import { callMethodAtEndpoint } from '../../meteor-helpers/method-endpoint';
+import { limitQuery, applyPagination } from '../../utils/pagination-helpers';
 
 exports.Query = {
   user: async (root, { _id, email }, { mongo: { Users } }) => {
@@ -75,16 +76,25 @@ exports.User = {
     const email = emails[0].address;
     return firstName && lastName ? `${firstName} ${lastName}` : email;
   },
-  groups: async ({ _id }, { workspace }, { mongo: { Groups } }) => {
-    const query = {
+  groups: async ({ _id }, { workspace, oneToOne, first, last, before, after, sortField = 'lastMessage', sortOrder = -1 }, { mongo: { Groups } }) => {
+    const q = {
+      workspace,
       members: _id,
       deleted: { $ne: true },
     };
-    if (workspace) {
-      query.workspace = workspace;
-    }
-    const groups = await Groups.find(query).sort({ lastMessage: -1 }).toArray();
-    return groups;
+    // add optional params
+    if (oneToOne !== undefined) q.oneToOne = oneToOne;
+
+    const cursor = await limitQuery(Groups, { sortField, sortOrder, before, after, q });
+    const pageInfo = await applyPagination(cursor, first, last);
+    const groups = await cursor.toArray();
+    return {
+      edges: groups.map(g => ({
+        node: g,
+        cursor: g._id,
+      })),
+      pageInfo,
+    };
   },
   coworkers: async ({ _id }, { workspace }, { mongo: { Workspaces, Users } }) => {
     const query = { members: _id };

@@ -33,7 +33,7 @@ User = `
     lastName: String! # user last name
     username: String! # This is the name we will show other users (actually a users full name)
     messages: [Message] # messages sent by user
-    groups(workspace: ID): [Group] # groups the user belongs to
+    groups(workspace: ID!, oneToOne: Boolean, first: Int, after: String, last: Int, before: String, sortField: String, sortOrder: Int): GroupConnection # paginated groups the user belongs to
     coworkers(workspace: ID): [User] # Users this user shares workspace(s) with
     timezone: String
     lastWorkspace: String # last workspace accessed by user
