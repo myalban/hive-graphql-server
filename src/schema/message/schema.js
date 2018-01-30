@@ -18,7 +18,8 @@ Message = `
   }
   
   extend type Mutation {
-    insertMessage(workspace: String!, groupId: String!, body: String!): Message
+    # Inserts a new message
+    insertMessage(workspace: String!, groupId: String!, body: String!, mentions: [String]): Message
     
     # Edits message details like body, mentions and attachments
     editMessage(messageId: String!, body: String, mentions: [String]): Message

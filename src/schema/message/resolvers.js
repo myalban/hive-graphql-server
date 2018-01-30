@@ -22,20 +22,20 @@ exports.Subscription = {
 };
 
 exports.Mutation = {
-  insertMessage: async (root, { workspace, groupId, body }, { user }) => {
+  insertMessage: async (root, { workspace, groupId, body, mentions = [] }, { user }) => {
     const methodArgs = {
       workspace,
       containerType: 'group',
       containerId: groupId,
       body,
-      mentions: [],
+      mentions,
       attachments: [],
       automated: false,
       senderPicture: null,
       senderFirstName: null,
     };
-    const message = await callMethodAtEndpoint('messages.insert', { 'x-userid': user._id }, [methodArgs]);
-    return message;
+
+    return callMethodAtEndpoint('messages.insert', { 'x-userid': user._id }, [methodArgs]);
   },
 
   editMessage: async (root, { messageId, body = '', mentions = [], attachments = [] }, { user }) => {
