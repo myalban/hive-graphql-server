@@ -43,7 +43,7 @@ Group = `
   }
 
   type GroupEdge {
-    cursor: String!
-    node: Group!
+    cursor: String! # group id
+    node: Group! # group object
   }
 `;
