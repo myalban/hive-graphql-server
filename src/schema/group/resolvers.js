@@ -122,14 +122,6 @@ exports.Group = {
   users: async ({ members }, data, { mongo: { Users } }) => {
     return await Users.find({ _id: { $in: members } }).toArray();
   },
-  lastMessage: async ({ _id }, data, { mongo: { Messages } }) => {
-    // find last message
-    const messages = await Messages.find({
-      deleted: false,
-      containerId: _id,
-    }, { sort: { createdAt: -1 }, limit: 1 }).toArray();
-    return messages[0];
-  },
   readBy: async ({ readBy }, data, { mongo: { Users } }) => {
     const userIds = readBy.map(item => item.userId);
     const users = await Users.find({ _id: { $in: userIds } }).toArray();

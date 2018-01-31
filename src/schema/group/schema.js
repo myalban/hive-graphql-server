@@ -36,7 +36,7 @@ Group = `
     users: [User]! # users in the group
     messages(first: Int, after: String, last: Int, before: String, sortField: String, sortOrder: Int): MessageConnection
     deleted: Boolean! # whether or not this message has been deleted
-    lastMessage: Message # last message sent in this group
+    lastMessage: Date # date last message was sent in this group
     readBy: [ReadBy]! # users that this group has been readBy
     isTyping: [User!]! # indicates whether a user is currently typing
   }
