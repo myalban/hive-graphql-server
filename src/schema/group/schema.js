@@ -36,4 +36,14 @@ Group = `
     users: [User]! # users in the group
     messages(first: Int, after: String, last: Int, before: String, sortField: String, sortOrder: Int): MessageConnection
   }
+
+  type GroupConnection {
+    edges: [GroupEdge]
+    pageInfo: PageInfo!
+  }
+
+  type GroupEdge {
+    cursor: String! # group id
+    node: Group! # group object
+  }
 `;
