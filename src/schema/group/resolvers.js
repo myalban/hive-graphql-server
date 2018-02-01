@@ -121,6 +121,19 @@ exports.Group = {
   },
   users: async ({ members }, data, { mongo: { Users } }) => {
     return await Users.find({ _id: { $in: members } }).toArray();
-    // return [];
+  },
+  readBy: async ({ readBy }, data, { mongo: { Users } }) => {
+    const userIds = readBy.map(item => item.userId);
+    const users = await Users.find({ _id: { $in: userIds } }).toArray();
+    // map readBy userIds to user objects
+    const result = readBy.map(r => ({
+      date: r.date,
+      user: users.find(u => u._id === r.userId),
+    }));
+    return result;
+  },
+  isTyping: async ({ isTyping }, data, { mongo: { Users } }) => {
+    const users = await Users.find({ _id: { $in: isTyping } }).toArray();
+    return users;
   },
 };
