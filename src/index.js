@@ -10,7 +10,7 @@ import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 // import { NotAuthorized } from './errors/not-authorized';
-import { JWT_SECRET, GRAPHQL_URL } from './config';
+import { JWT_SECRET, GRAPHQL_URL, LOCAL_METEOR_USER } from './config';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
@@ -114,6 +114,10 @@ const start = async () => {
           if (authToken) {
             const authHeader = `Bearer ${useMeteorToken ? 'meteor-' : ''}${authToken}`;
             user = await checkAuth(authHeader, { Users: mongo.Users, JWT_SECRET });
+          } else {
+            // For now use email address from LOCAL_METEOR_USER
+            // to act as that user during subscriptions.
+            user = await mongo.Users.findOne({ 'emails.address': LOCAL_METEOR_USER });
           }
           return { user, mongo };
           // throw new Error('Missing auth token!');

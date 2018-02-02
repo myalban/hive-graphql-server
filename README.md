@@ -20,6 +20,9 @@ The url for this graphql server, can be localhost
 ### METEOR_URL
 The url for the meteor app
 
+### LOCAL_METEOR_USER
+Email address used to act as a given user from GraphiQL for subscriptions only. To ensure accurate data, make sure the email you use here is the same as the email for the user you called login with to get your JWT used in LOCAL_JWT.
+
 ### MONGO_URL
 ### REDIS_URL
 ### REDIS_PORT
