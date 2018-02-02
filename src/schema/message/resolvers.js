@@ -12,7 +12,7 @@ exports.Subscription = {
       (payload, { groupIds = [] }, { user }) => {
         // Only return messages in arguments groupIds array + messages not from current user.
         const message = payload.messageAdded;
-        return groupIds.includes(message.containerId) && user._id !== message.createdBy;
+        return groupIds.includes(message.containerId);
       }),
   },
   messageChanged: {

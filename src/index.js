@@ -10,10 +10,10 @@ import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 // import { NotAuthorized } from './errors/not-authorized';
+import { JWT_SECRET, GRAPHQL_URL } from './config';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
-import { LOCAL_JWT, JWT_SECRET, LOCAL_METEOR_USER } from './config';
 import schema from './schema';
 
 const PORT = process.env.PORT || 3030;
@@ -93,14 +93,11 @@ const start = async () => {
   app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql',
     // Use tokens from local env for GraphiQL
-    passHeader: `
-      'Authorization': 'Bearer ${LOCAL_JWT}',
-    `,
     // If you want to use Meteor token, uncomment below:
     // passHeader: `
     //   'Authorization': 'Bearer meteor-${LOCAL_METEOR_TOKEN}',
     // `,
-    subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,
+    subscriptionsEndpoint: `ws://${GRAPHQL_URL}:${PORT}/subscriptions`,
   }));
 
   const server = createServer(app);
@@ -117,10 +114,6 @@ const start = async () => {
           if (authToken) {
             const authHeader = `Bearer ${useMeteorToken ? 'meteor-' : ''}${authToken}`;
             user = await checkAuth(authHeader, { Users: mongo.Users, JWT_SECRET });
-          } else {
-            // For now use email address from LOCAL_METEOR_USER
-            // to act as that user during subscriptions.
-            user = await mongo.Users.findOne({ 'emails.address': LOCAL_METEOR_USER });
           }
           return { user, mongo };
           // throw new Error('Missing auth token!');
@@ -128,7 +121,7 @@ const start = async () => {
       },
       { server, path: '/subscriptions' },
     );
-    console.log(`Hive GraphQL server started at http://localhost:${PORT}`);
+    console.log(`Hive GraphQL server started at ${GRAPHQL_URL}:${PORT}`);
   });
 };
 

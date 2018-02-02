@@ -1,7 +1,7 @@
 import request from 'request-promise';
 
 export const callMethodAtEndpoint = async (methodName, headers = {}, methodArgs) => {
-  const url = 'http://localhost:3000/hvmethods/v1/';
+  const url = `https://${process.env.METEOR_URL}hvmethods/v1/`;
   const options = {
     method: 'POST',
     headers,

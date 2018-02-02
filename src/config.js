@@ -4,16 +4,19 @@ dotenv.config({ silent: true });
 
 export const {
   JWT_SECRET,
-  LOCAL_METEOR_TOKEN,
-  LOCAL_JWT,
-  LOCAL_METEOR_USER,
+  METEOR_URL,
+  GRAPHQL_URL,
+  MONGO_URL
 } = process.env;
 
 const defaults = {
   JWT_SECRET: 'some_secret_this_is',
-  LOCAL_METEOR_TOKEN: 'ABC.123',
-  LOCAL_JWT: 'XYZ.987',
-  LOCAL_METEOR_USER: 'sillybilly@site.com',
+  METEOR_URL: 'meteor.hive.com',
+  GRAPHQL_URL: 'graphql.hive.com',
+  MONGO_URL: 'mongodb://mongo.hive.com:3001',
+  REDIS_URL: 'redis.hive.com',
+  REDIS_PORT: 1234,
+  REDIS_PASSWORD: 'secret_redis_password_here',
 };
 
 Object.keys(defaults).forEach((key) => {

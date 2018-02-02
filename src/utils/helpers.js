@@ -79,7 +79,7 @@ export async function globalRank(Actions, workspace, aboveActionId = '', belowAc
 }
 
 export function createNewNotification(userId, oldAction, actionId, newAction = false) {
-  const internalApiUrl = process.env.API_URL || 'http://localhost:3000';
+  const internalApiUrl = process.env.METEOR_URL ? `https://${process.env.METEOR_URL}` : 'http://localhost:3000';
   const createNotificationApi = `${internalApiUrl}/create-action-notification`;
   const data = {
     userId,
