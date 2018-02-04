@@ -38,6 +38,17 @@ exports.Mutation = {
     return callMethodAtEndpoint('messages.insert', { 'x-userid': user._id }, [methodArgs]);
   },
 
+  editMessage: async (root, { messageId, body = '', mentions = [], attachments = [] }, { user }) => {
+    const methodArgs = {
+      body,
+      mentions,
+      messageId,
+      attachments,
+    };
+
+    return callMethodAtEndpoint('messages.edit', { 'x-userid': user._id }, [methodArgs]);
+  },
+
   deleteMessage: async (root, { messageId }, { user }) => callMethodAtEndpoint(
     'messages.delete',
     { 'x-userid': user._id },
