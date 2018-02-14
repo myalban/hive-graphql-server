@@ -5,13 +5,10 @@
             "script": "./build/index.js",
             "merge_logs": true,
             "max_restarts": 20,
-            "instances": 2,
+            "instances": 1,
             "max_memory_restart": "200M",
             "env": {
-                "MONGO_URL": "mongodb://localhost:3001/meteor",
-                "API_URL": "http://localhost:3000",
-                "PORT": 3030,
-                "NODE_ENV": "dev"
+               "NODE_ENV": "dev"
             }
         }
     ]
