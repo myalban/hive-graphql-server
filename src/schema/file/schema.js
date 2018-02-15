@@ -15,6 +15,7 @@ File = `
 
   type File {
     _id: ID!
+    name: String!
     url: String!
     thumbnail: String
     fileStore: FileStore!
