@@ -1,0 +1,10 @@
+node_modules
+build
+.idea/*
+/dump.rdb
+.elasticbeanstalk
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
