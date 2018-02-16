@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run compile && node build/index.js",
-    "compile": "npm install && babel -d ./build ./src -s",
+    "compile": "npm install && ./node_modules/.bin/babel -d ./build ./src -s",
     "build": "npm run clean && npm run compile",
     "prod": "npm run build && pm2 start ./node_modules/hive-graphql-env/production.json",
     "staging": "npm run build && pm2 start ./node_modules/hive-graphql-env/staging.json",
@@ -45,7 +45,7 @@
     "subscriptions-transport-ws": "^0.9.4"
   },
   "optionalDependencies": {
-    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#4602167dffdded215f45f78c484f55f226519b67",
+    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#9862eac56b1b06b14e3ced7d09266c997fe15817",
     "hive-graphql-env": "git+ssh@github.com:hiveteams/hive-graphql-env.git#954066a6d1516d6946fa9e69a65ac2c406ba9aab"
   },
   "devDependencies": {
