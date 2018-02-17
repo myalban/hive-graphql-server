@@ -18,7 +18,7 @@ import schema from './schema';
 
 const PORT = process.env.PORT || 3030;
 const SUBSCRIPTIONS_EP = process.env.NODE_ENV ?
-  `ws://${GRAPHQL_URL}/subscriptions` :
+  `wss://${GRAPHQL_URL}/subscriptions` :
   `ws://localhost:${PORT}/subscriptions`;
 
 const start = async () => {
