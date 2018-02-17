@@ -17,6 +17,9 @@ import formatError from './utils/format-error';
 import schema from './schema';
 
 const PORT = process.env.PORT || 3030;
+const SUBSCRIPTIONS_EP = process.env.NODE_ENV ?
+  `ws://${GRAPHQL_URL}/subscriptions` :
+  `ws://localhost:${PORT}/subscriptions`;
 
 const start = async () => {
   const mongo = await connectMongo();
@@ -97,7 +100,7 @@ const start = async () => {
     // passHeader: `
     //   'Authorization': 'Bearer meteor-${LOCAL_METEOR_TOKEN}',
     // `,
-    subscriptionsEndpoint: `ws://${GRAPHQL_URL}:${PORT}/subscriptions`,
+    subscriptionsEndpoint: SUBSCRIPTIONS_EP,
   }));
 
   const server = createServer(app);
@@ -125,7 +128,7 @@ const start = async () => {
       },
       { server, path: '/subscriptions' },
     );
-    console.log(`Hive GraphQL server started at ${GRAPHQL_URL}:${PORT}`);
+    console.log('Hive GraphQL server started');
   });
 };
 
