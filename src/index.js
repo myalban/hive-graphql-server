@@ -1,5 +1,5 @@
 import 'babel-polyfill';
-import pm2 from 'pm2';
+// import pm2 from 'pm2';
 import OpticsAgent from 'optics-agent';
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -26,7 +26,12 @@ const start = async () => {
   const app = express();
 
   // Global middleware
-  app.use(morgan('dev'));
+  app.use(morgan('dev', {
+    skip(req) {
+      // Exclude healthchecks
+      return req.originalUrl.includes('healthcheck');
+    },
+  }));
 
   // Set up shared context
   const buildOptions = async (req) => {
@@ -72,20 +77,22 @@ const start = async () => {
 
   // basic health check
   app.use('/healthcheck', (req, res) => {
-    let ok = false;
-    pm2.list((err, results) => {
-      results.forEach((instance) => {
-        if (instance.pm2_env.status === 'online') {
-          ok = true;
-        }
-      });
+    // NOTE: For now, don't use pm2 for health check since we only have single items in cluster.
+    // let ok = false;
+    // pm2.list((err, results) => {
+    //   results.forEach((instance) => {
+    //     if (instance.pm2_env.status === 'online') {
+    //       ok = true;
+    //     }
+    //   });
 
-      if (ok) {
-        return res.sendStatus(200);
-      }
+    //   if (ok) {
+    //     return res.sendStatus(200);
+    //   }
 
-      return res.sendStatus(500);
-    });
+    //   return res.sendStatus(500);
+    // });
+    res.sendStatus(200);
   });
 
   app.use(OpticsAgent.middleware());
