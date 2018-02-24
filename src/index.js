@@ -11,6 +11,7 @@ import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 // import { NotAuthorized } from './errors/not-authorized';
 import { JWT_SECRET, GRAPHQL_URL, LOCAL_METEOR_USER } from './config';
+import logger from './utils/logger';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
@@ -31,6 +32,7 @@ const start = async () => {
       // Exclude healthchecks
       return req.originalUrl.includes('healthcheck');
     },
+    stream: logger.stream,
   }));
 
   // Set up shared context
@@ -40,10 +42,6 @@ const start = async () => {
     if (typeof authorization !== 'undefined') {
       user = await checkAuth(authorization, { Users: mongo.Users, JWT_SECRET });
     }
-    // No auth is okay since users need to log in.
-    // if (!user) {
-    //   throw new NotAuthorized();
-    // }
 
     return {
       context: {
@@ -67,7 +65,6 @@ const start = async () => {
   app.use('/graphql', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, email');
-    // console.log(req);
     if (req.method === 'OPTIONS') {
       res.sendStatus(200);
     } else {
@@ -135,7 +132,7 @@ const start = async () => {
       },
       { server, path: '/subscriptions' },
     );
-    console.log('Hive GraphQL server started');
+    logger.info('Hive GraphQL server started');
   });
 };
 

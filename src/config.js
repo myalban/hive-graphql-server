@@ -10,7 +10,9 @@ export const {
   MONGO_URL,
   REDIS_URL,
   REDIS_PORT,
-  REDIS_PASSWORD
+  REDIS_PASSWORD,
+  PAPERTRAIL_HOST,
+  PAPERTRAIL_PORT,
 } = process.env;
 
 const defaults = {
@@ -22,6 +24,8 @@ const defaults = {
   REDIS_URL: 'redis.hive.com',
   REDIS_PORT: 1234,
   REDIS_PASSWORD: 'secret_redis_password_here',
+  PAPERTRAIL_HOST: 'logs.papertrailapp.com',
+  PAPERTRAIL_PORT: 55555,
 };
 
 Object.keys(defaults).forEach((key) => {

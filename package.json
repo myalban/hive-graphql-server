@@ -16,7 +16,7 @@
     "pm2-delete": "npm run pm2-stop && pm2 delete all",
     "pm2-monit": "pm2 monit",
     "clean": "rm -rf build && mkdir build",
-    "dev": "nodemon src/index.js --exec babel-node",
+    "dev": "NODE_ENV=dev nodemon src/index.js --exec babel-node",
     "test-server": "mocha --compilers js:babel-core/register **/*.serverSpec.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -43,7 +43,9 @@
     "optics-agent": "^1.1.6",
     "pm2": "^2.6.1",
     "request": "^2.83.0",
-    "subscriptions-transport-ws": "^0.9.4"
+    "subscriptions-transport-ws": "^0.9.4",
+    "winston": "^2.4.0",
+    "winston-papertrail": "^1.0.5"
   },
   "optionalDependencies": {
     "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#7b9a6ff34114d67cc3f4de425b5b320355255b9b",
