@@ -1,9 +1,17 @@
 import { assertUserPermission } from '../../utils/validation';
-import { globalRank, transformStringAttrsToDates, getPrivacyClause, createNewNotification, updateParentSubactionCount } from '../../utils/helpers';
+import {
+  globalRank,
+  transformStringAttrsToDates,
+  getPrivacyClause,
+  createNewNotification,
+  updateParentSubactionCount,
+  getAbsoluteUrl,
+} from '../../utils/helpers';
 import ancestorAttributes from '../../utils/ancestor-attributes';
 
 exports.Query = {
-  actionList: async (root, { workspace, limit = null, skip = 0, filters = {} },
+  actionList: async (root,
+    { workspace, limit = null, skip = 0, filters = {} },
     { mongo: { Actions, Workspaces }, user }) => {
     await assertUserPermission(workspace, user._id, Workspaces);
 
@@ -183,4 +191,16 @@ exports.Mutation = {
 
 exports.Action = {
   description: ({ description }) => description || '',
+
+  /**
+   * Returns an absolute url based on current environment
+   *
+   * @param {object} action
+   * @return {string}
+   */
+  url: ({ _id, workspace }) => {
+    const absoluteUrl = getAbsoluteUrl();
+
+    return `${absoluteUrl}workspace/${workspace}?actionId=${_id}`;
+  },
 };

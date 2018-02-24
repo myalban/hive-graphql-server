@@ -63,6 +63,8 @@ Action = `
     modifiedBy: String
     snoozeDate: String
     ganttExpanded: [GanttExpanded]
+    # Absolute url to the action
+    url: String
   }
 
   type AncestorAttributes {

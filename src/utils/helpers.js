@@ -1,5 +1,6 @@
 import axios from 'axios';
 import _ from 'lodash';
+import environment from './environment-helpers';
 
 export async function globalRank(Actions, workspace, aboveActionId = '', belowActionId = '', existingActionId = false, sortingBy) {
   // Determine global rank based on workspace, above action, below action and moving action
@@ -125,3 +126,19 @@ export function updateParentSubactionCount(Actions, query) {
     });
   });
 }
+
+/**
+ * Returns an absolute url based on current environment
+ *
+ * @return {string}
+ */
+export const getAbsoluteUrl = () => {
+  const PORT = 3000;
+  const environmentUrlsMap = {
+    dev: `http://localhost:${PORT}/`,
+    test: `http://localhost:${PORT}/`,
+    staging: 'https://staging.hive.com/',
+    prod: 'https://app.hive.com/',
+  };
+  return environmentUrlsMap[environment.getEnv()] || environmentUrlsMap.dev;
+};
