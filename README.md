@@ -14,14 +14,23 @@ We're using a .env file to capture environment variables. Copy the sample [.env.
 ### JWT_SECRET
 You can use any value you want in local development. JWT will use this secret to sign all requested tokens.
 
-### LOCAL_JWT
-Used to act as a given user from GraphiQL. Call the `login` mutation, copy the JWT returned and replace the one in your .env file.
+### GRAPHQL_URL
+The url for this graphql server, can be localhost
+
+### METEOR_URL
+The url for the meteor app
 
 ### LOCAL_METEOR_USER
-Email address used to act as a given user from GraphiQL for **subscriptions only**. To ensure accurate data, make sure the email you use here is the same as the email for the user you called `login` with to get your JWT used in `LOCAL_JWT`.
+Email address used to act as a given user from GraphiQL for subscriptions only. To ensure accurate data, make sure the email you use here is the same as the email for the user you called login with to get your JWT used in LOCAL_JWT.
 
-### LOCAL_METEOR_TOKEN (Will be deprecated)
-If you'd like to use a Meteor login token for auth, you can. This will be deprecated eventually as graphQL clients will solely use JWT.
+### MONGO_URL
+### REDIS_URL
+### REDIS_PORT
+### REDIS_PASSWORD
+
+## Graphiql
+use ModHeader or a similar tool to add your jwt to your header:
+https://chrome.google.com/webstore/detail/modheader/idgpnmonknjnojddfkpgkljpfnnfcklj/related
 
 ## Docker (Tentative)
 1. Install docker

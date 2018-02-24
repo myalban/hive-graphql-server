@@ -1,5 +1,5 @@
 import 'babel-polyfill';
-import pm2 from 'pm2';
+// import pm2 from 'pm2';
 import OpticsAgent from 'optics-agent';
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -10,20 +10,30 @@ import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 // import { NotAuthorized } from './errors/not-authorized';
+import { JWT_SECRET, GRAPHQL_URL, LOCAL_METEOR_USER } from './config';
+import logger from './utils/logger';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
-import { LOCAL_JWT, JWT_SECRET, LOCAL_METEOR_USER } from './config';
 import schema from './schema';
 
 const PORT = process.env.PORT || 3030;
+const SUBSCRIPTIONS_EP = process.env.NODE_ENV ?
+  `wss://${GRAPHQL_URL}/subscriptions` :
+  `ws://localhost:${PORT}/subscriptions`;
 
 const start = async () => {
   const mongo = await connectMongo();
   const app = express();
 
   // Global middleware
-  app.use(morgan('dev'));
+  app.use(morgan(':date[iso] :method :url :status :response-time ms', {
+    skip(req) {
+      // Exclude healthchecks
+      return req.originalUrl.includes('healthcheck');
+    },
+    stream: logger.stream,
+  }));
 
   // Set up shared context
   const buildOptions = async (req) => {
@@ -32,10 +42,6 @@ const start = async () => {
     if (typeof authorization !== 'undefined') {
       user = await checkAuth(authorization, { Users: mongo.Users, JWT_SECRET });
     }
-    // No auth is okay since users need to log in.
-    // if (!user) {
-    //   throw new NotAuthorized();
-    // }
 
     return {
       context: {
@@ -59,7 +65,6 @@ const start = async () => {
   app.use('/graphql', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, email');
-    // console.log(req);
     if (req.method === 'OPTIONS') {
       res.sendStatus(200);
     } else {
@@ -69,20 +74,22 @@ const start = async () => {
 
   // basic health check
   app.use('/healthcheck', (req, res) => {
-    let ok = false;
-    pm2.list((err, results) => {
-      results.forEach((instance) => {
-        if (instance.pm2_env.status === 'online') {
-          ok = true;
-        }
-      });
+    // NOTE: For now, don't use pm2 for health check since we only have single items in cluster.
+    // let ok = false;
+    // pm2.list((err, results) => {
+    //   results.forEach((instance) => {
+    //     if (instance.pm2_env.status === 'online') {
+    //       ok = true;
+    //     }
+    //   });
 
-      if (ok) {
-        return res.sendStatus(200);
-      }
+    //   if (ok) {
+    //     return res.sendStatus(200);
+    //   }
 
-      return res.sendStatus(500);
-    });
+    //   return res.sendStatus(500);
+    // });
+    res.sendStatus(200);
   });
 
   app.use(OpticsAgent.middleware());
@@ -93,14 +100,11 @@ const start = async () => {
   app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql',
     // Use tokens from local env for GraphiQL
-    passHeader: `
-      'Authorization': 'Bearer ${LOCAL_JWT}',
-    `,
     // If you want to use Meteor token, uncomment below:
     // passHeader: `
     //   'Authorization': 'Bearer meteor-${LOCAL_METEOR_TOKEN}',
     // `,
-    subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,
+    subscriptionsEndpoint: SUBSCRIPTIONS_EP,
   }));
 
   const server = createServer(app);
@@ -128,7 +132,7 @@ const start = async () => {
       },
       { server, path: '/subscriptions' },
     );
-    console.log(`Hive GraphQL server started at http://localhost:${PORT}`);
+    logger.info('Hive GraphQL server started');
   });
 };
 

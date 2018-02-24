@@ -4,6 +4,8 @@
   "description": "Hive GraphQL express server",
   "main": "index.js",
   "scripts": {
+    "start": "npm run build && node ./node_modules/.bin/pm2 start staging-cluster.json",
+    "poststart": "node ./node_modules/.bin/pm2 logs",
     "compile": "npm install && babel -d ./build ./src -s",
     "build": "npm run clean && npm run compile",
     "prod": "npm run build && pm2 start ./node_modules/hive-graphql-env/production.json",
@@ -14,7 +16,7 @@
     "pm2-delete": "npm run pm2-stop && pm2 delete all",
     "pm2-monit": "pm2 monit",
     "clean": "rm -rf build && mkdir build",
-    "dev": "MONGO_URL=\"mongodb://localhost:3001/meteor\" nodemon src/index.js --exec babel-node",
+    "dev": "NODE_ENV=dev nodemon src/index.js --exec babel-node",
     "test-server": "mocha --compilers js:babel-core/register **/*.serverSpec.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -41,10 +43,12 @@
     "optics-agent": "^1.1.6",
     "pm2": "^2.6.1",
     "request": "^2.83.0",
-    "subscriptions-transport-ws": "^0.9.4"
+    "subscriptions-transport-ws": "^0.9.4",
+    "winston": "^2.4.0",
+    "winston-papertrail": "^1.0.5"
   },
   "optionalDependencies": {
-    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#4602167dffdded215f45f78c484f55f226519b67",
+    "hive-graphql-auth": "git+ssh@github.com:hiveteams/hive-graphql-auth.git#7b9a6ff34114d67cc3f4de425b5b320355255b9b",
     "hive-graphql-env": "git+ssh@github.com:hiveteams/hive-graphql-env.git#954066a6d1516d6946fa9e69a65ac2c406ba9aab"
   },
   "devDependencies": {

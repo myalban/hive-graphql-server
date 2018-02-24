@@ -1,9 +1,8 @@
 node_modules
-build
-.env
 .idea/*
 /dump.rdb
 .elasticbeanstalk
+.git
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

@@ -3,11 +3,11 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 import Redis from 'ioredis';
 
-const REDIS_DOMAIN_NAME = 'localhost';
-const PORT_NUMBER = 6379;
+const { REDIS_URL, REDIS_PORT, REDIS_PASSWORD } = process.env;
 const options = {
-  host: REDIS_DOMAIN_NAME,
-  port: PORT_NUMBER,
+  host: REDIS_URL,
+  port: REDIS_PORT,
+  password: REDIS_PASSWORD,
   retry_strategy: opts => Math.max(opts.attempt * 100, 3000),
 };
 
