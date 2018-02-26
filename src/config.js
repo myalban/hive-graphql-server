@@ -1,6 +1,12 @@
 import dotenv from 'dotenv';
+import path from 'path';
+import environment from './utils/environment-helpers';
 
-dotenv.config({ silent: true });
+const envPath = environment.isDev() ?
+  path.resolve(process.cwd(), '.env.local') :
+  path.resolve(process.cwd(), '.env');
+
+dotenv.config({ silent: true, path: envPath });
 
 export const {
   JWT_SECRET,
