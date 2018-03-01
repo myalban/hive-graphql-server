@@ -4,7 +4,7 @@ import environment from './utils/environment-helpers';
 
 const envPath = environment.isDev() ?
   path.resolve(process.cwd(), '.env.local') :
-  path.resolve(process.cwd(), '.env');
+  path.resolve(process.cwd(), `.env.${environment.getEnv()}`);
 
 dotenv.config({ silent: true, path: envPath });
 
