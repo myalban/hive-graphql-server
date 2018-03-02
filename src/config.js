@@ -19,6 +19,8 @@ export const {
   REDIS_PASSWORD,
   PAPERTRAIL_HOST,
   PAPERTRAIL_PORT,
+  METHOD_ENDPOINT_SECRET,
+  METHOD_ENDPOINT_BASE,
 } = process.env;
 
 const defaults = {
