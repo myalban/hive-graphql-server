@@ -34,7 +34,7 @@ exports.Mutation = {
       senderPicture: null,
       senderFirstName: null,
     };
-
+    if (!user) throw new Error('Must be logged in to call the "insertMessage" mutation');
     return callMethodAtEndpoint('messages.insert', { 'x-userid': user._id }, [methodArgs]);
   },
 
@@ -45,24 +45,27 @@ exports.Mutation = {
       messageId,
       attachments,
     };
-
+    if (!user) throw new Error('Must be logged in to call the "editMessage" mutation');
     return callMethodAtEndpoint('messages.edit', { 'x-userid': user._id }, [methodArgs]);
   },
 
-  deleteMessage: async (root, { messageId }, { user }) => callMethodAtEndpoint(
-    'messages.delete',
-    { 'x-userid': user._id },
-    [{ _id: messageId }],
-  ),
+  deleteMessage: async (root, { messageId }, { user }) => {
+    if (!user) throw new Error('Must be logged in to call the "deleteMessage" mutation');
+    return callMethodAtEndpoint(
+      'messages.delete',
+      { 'x-userid': user._id },
+      [{ _id: messageId }],
+    );
+  },
   addReaction: async (root, { messageId, emoji }, { user }) => {
     const methodArgs = { messageId, emoji };
-
+    if (!user) throw new Error('Must be logged in to call the "addReaction" mutation');
     return callMethodAtEndpoint('messages.addReaction', { 'x-userid': user._id }, [methodArgs]);
   },
 
   removeReaction: async (root, { messageId, emoji }, { user }) => {
     const methodArgs = { messageId, emoji };
-
+    if (!user) throw new Error('Must be logged in to call the "removeReaction" mutation');
     return callMethodAtEndpoint('messages.removeReaction', { 'x-userid': user._id }, [methodArgs]);
   },
 };

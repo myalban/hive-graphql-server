@@ -27,7 +27,7 @@ const start = async () => {
   const app = express();
 
   // Global middleware
-  app.use(morgan(':date[iso] :method :url :status :response-time ms', {
+  app.use(morgan(':date[iso] :remote-addr :method :url :status :response-time ms', {
     skip(req) {
       // Exclude healthchecks
       return req.originalUrl.includes('healthcheck');
