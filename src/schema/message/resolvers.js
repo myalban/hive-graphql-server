@@ -9,7 +9,7 @@ exports.Subscription = {
     // asyncIterator w/ workspace points to redis channel topic
     subscribe: withFilter(
       (root, args) => pubsub.asyncIterator(`messageAdded.${args.workspace}`),
-      (payload, { groupIds = [] }, { user }) => {
+      (payload, { groupIds = [] }) => {
         // Only return messages in arguments groupIds array + messages not from current user.
         const message = payload.messageAdded;
         return groupIds.includes(message.containerId);
