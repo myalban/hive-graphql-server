@@ -23,11 +23,14 @@ exports.Subscription = {
   groupChanged: {
     // asyncIterator w/ workspace points to redis channel topic
     subscribe: withFilter(
-      (root, args) => pubsub.asyncIterator(`groupAdded.${args.workspace}`),
-      (payload, args, { user }) => {
-        // Only return groups where user is member and not creator.
+      (root, args) => pubsub.asyncIterator(`groupChanged.${args.workspace}`),
+      (payload, { groupIds = [] }, { user }) => {
+        // Only return groups where user is member and cares about group (groupIds array).
         const group = payload.groupChanged;
-        return group.members.includes(user._id) && user._id !== group.createdBy;
+        const userInGroup = group.members.includes(user._id);
+        // Empty array means listen to all groups.
+        const caresAboutGroup = groupIds.length ? groupIds.includes(group._id) : true;
+        return userInGroup && caresAboutGroup;
       }),
   },
 };

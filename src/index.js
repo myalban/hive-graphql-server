@@ -12,15 +12,16 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 // import { NotAuthorized } from './errors/not-authorized';
 import { JWT_SECRET, GRAPHQL_URL, LOCAL_METEOR_USER } from './config';
 import logger from './utils/logger';
+import environment from './utils/environment-helpers';
 import connectMongo from './mongo-connector';
 import buildDataloaders from './dataloaders';
 import formatError from './utils/format-error';
 import schema from './schema';
 
 const PORT = process.env.PORT || 3030;
-const SUBSCRIPTIONS_EP = process.env.NODE_ENV ?
-  `wss://${GRAPHQL_URL}/subscriptions` :
-  `ws://localhost:${PORT}/subscriptions`;
+const SUBSCRIPTIONS_EP = environment.isDev() ?
+  `ws://localhost:${PORT}/subscriptions` :
+  `wss://${GRAPHQL_URL}/subscriptions`;
 
 const start = async () => {
   const mongo = await connectMongo();

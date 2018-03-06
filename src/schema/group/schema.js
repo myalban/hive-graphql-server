@@ -17,8 +17,10 @@ Group = `
 
   extend type Subscription {
     groupAdded(workspace: String!): Group
-    # Tracks changes in workspace groups list
-    groupChanged(workspace: String!): Group
+    # Tracks changes in workspace groups list.
+    # Use the groupIds arg to specify groups to subscribe to, otherwise
+    # leave empty to subscribe to all groups.
+    groupChanged(workspace: String!, groupIds: [String]): Group
   }
 
   extend type Mutation {
