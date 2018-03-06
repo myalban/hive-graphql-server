@@ -78,11 +78,9 @@ exports.Mutation = {
     return group;
   },
 
-  newReadBy: async (root, { _id }, { user }) => callMethodAtEndpoint(
-    'groups.newReadBy',
-    { 'x-userid': user._id },
-    [{ groupId: _id }]
-  ),
+  newReadBy: async (root, { _id }, { user }) => {
+    return await callMethodAtEndpoint('groups.newReadBy', { 'x-userid': user._id }, [{ groupId: _id }]);
+  },
 };
 
 exports.Group = {
@@ -129,7 +127,7 @@ exports.Group = {
     const result = readBy.map(r => ({
       date: r.date,
       user: users.find(u => u._id === r.userId),
-    }));
+    })).filter(readByObject => !!readByObject.user); // Filter out not found users.
     return result;
   },
   isTyping: async ({ isTyping }, data, { mongo: { Users } }) => {
