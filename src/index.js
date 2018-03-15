@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 // import pm2 from 'pm2';
+import util from 'util';
 import OpticsAgent from 'optics-agent';
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -116,6 +117,12 @@ const start = async () => {
         execute,
         subscribe,
         schema,
+        onOperation: (message) => {
+          logger.info(`
+          Subscription operation:
+          ${util.inspect(message, { depth: null })}
+          `);
+        },
         onConnect: async ({ authToken, useMeteorToken }) => {
           let user;
           // TODO: Pass auth token from client or GraphiQL
