@@ -3,7 +3,7 @@ import 'babel-polyfill';
 import OpticsAgent from 'optics-agent';
 import express from 'express';
 import bodyParser from 'body-parser';
-import morgan from 'morgan';
+import morganBody from 'morgan-body';
 import checkAuth from 'hive-graphql-auth';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { execute, subscribe } from 'graphql';
@@ -28,13 +28,13 @@ const start = async () => {
   const app = express();
 
   // Global middleware
-  app.use(morgan(':date[iso] :remote-addr :method :url :status :response-time ms', {
+  morganBody(app, {
     skip(req) {
       // Exclude healthchecks
       return req.originalUrl.includes('healthcheck');
     },
     stream: logger.stream,
-  }));
+  });
 
   // Set up shared context
   const buildOptions = async (req) => {
