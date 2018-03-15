@@ -16,6 +16,7 @@
     "pm2-delete": "npm run pm2-stop && pm2 delete all",
     "pm2-monit": "pm2 monit",
     "clean": "rm -rf build && mkdir build",
+    "debug": "NODE_ENV=dev nodemon src/index.js --exec babel-node --inspect-brk=9229",
     "dev": "NODE_ENV=dev nodemon src/index.js --exec babel-node",
     "test-server": "mocha --compilers js:babel-core/register **/*.serverSpec.js",
     "test": "echo \"Error: no test specified\" && exit 1"
