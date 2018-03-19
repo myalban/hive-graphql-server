@@ -84,6 +84,11 @@ exports.Mutation = {
   newReadBy: async (root, { _id }, { user }) => {
     return await callMethodAtEndpoint('groups.newReadBy', { 'x-userid': user._id }, [{ groupId: _id }]);
   },
+
+  setGroupTyping: async (root, { groupId, setTo }, { user }) => {
+    await callMethodAtEndpoint('groups.setGroupTyping', { 'x-userid': user._id }, [{ groupId, setTo }]);
+    return !!setTo;
+  },
 };
 
 exports.Group = {

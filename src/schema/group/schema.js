@@ -29,6 +29,8 @@ Group = `
     deleteGroup(_id: String!): Group
     # Update last read time on a given Group from current User
     newReadBy(_id: String): Group
+    # Sets a user to is typing or not typing for a given group id
+    setGroupTyping(groupId: String!, setTo: Boolean!): Boolean
   }
 
   type Group {
