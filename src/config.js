@@ -38,7 +38,7 @@ const defaults = {
 
 Object.keys(defaults).forEach((key) => {
   if (!process.env[key] || process.env[key] === defaults[key]) {
-    throw new Error(`Please enter a custom ${key} in your .env file on the root directory`);
+    console.warn(`Please enter a custom ${key} in your .env file on the root directory`);
   }
 });
 
