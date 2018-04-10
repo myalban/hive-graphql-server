@@ -29,6 +29,7 @@ export default async function () {
     Users: meteorDb.collection('users'),
     Files: meteorDb.collection('myFiles'),
     UserSettings: meteorDb.collection('userSettings'),
+    UsersSessions: meteorDb.collection('usersSessions'),
   };
 
   return collections;

@@ -55,8 +55,18 @@ exports.Mutation = {
     await callMethodAtEndpoint('users.updateWorkspaceTime', { 'x-userid': user._id }, [{ workspaceId: workspace }]);
     return await Users.findOne({ _id: user._id });
   },
-  updateUserOnlineStatus: async (root, { status }, { mongo: { Users }, user }) => {
-    await Users.update({ _id: user._id }, { $set: { status } });
+  // 1. Always set to online when this method is called
+  // 2. Set to away/offline when there aren't any other open connections
+  updateUserOnlineStatus: async (root, { status }, { mongo: { Users, UsersSessions }, user }) => {
+    if (status === 'online') {
+      await Users.update({ _id: user._id }, { $set: { status } });
+    } else {
+      const openSessions = await UsersSessions.findOne({ _id: user._id });
+      if (!openSessions) {
+        await Users.update({ _id: user._id }, { $set: { status } });
+      }
+    }
+
     return await Users.findOne({ _id: user._id });
   },
 };
