@@ -19,7 +19,7 @@ exports.Mutation = {
   login: async (root, { email, password }, { mongo: { Users } }) => {
     // Find user by email
     // TODO: Handle already logged in?
-    const sentEmailRegex = new RegExp(email, 'i');
+    const sentEmailRegex = new RegExp(`^${email}$`, 'i');
     const user = await Users.findOne({ 'emails.0.address': sentEmailRegex });
     if (user) {
       // Validate password
@@ -59,11 +59,11 @@ exports.Mutation = {
   // 2. Set to away/offline when there aren't any other open connections
   updateUserOnlineStatus: async (root, { status }, { mongo: { Users, UsersSessions }, user }) => {
     if (status === 'online') {
-      await Users.update({ _id: user._id }, { $set: { status } });
+      await Users.update({ _id: user._id }, { $set: { status, lastStatusChange: new Date() } });
     } else {
       const openSessions = await UsersSessions.findOne({ _id: user._id });
       if (!openSessions) {
-        await Users.update({ _id: user._id }, { $set: { status } });
+        await Users.update({ _id: user._id }, { $set: { status, lastStatusChange: new Date() } });
       }
     }
 
