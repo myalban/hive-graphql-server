@@ -22,6 +22,7 @@ User = `
     login(email: String!, password: String!): User
     updateUserLastWorkspace(workspace: String!): User
     updateUserTimezone(timezone: String!): User
+    # Updates the current user's online status
     updateUserOnlineStatus(status: UserStatusEnum!): User
   }
 
