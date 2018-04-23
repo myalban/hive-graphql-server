@@ -112,7 +112,8 @@ exports.User = {
       query._id = workspace;
     }
     const workspaces = await Workspaces.find(query).toArray();
-    const members = workspaces.reduce((acc, curr) => _.uniq(acc.concat(curr.members)), []);
+    const members = workspaces.reduce((acc, curr) =>
+      _.uniq(acc.concat(curr.members).concat(curr.externalMembers.map(m => m.userId))), []);
     return await Users.find({ _id: { $in: members } }).toArray();
   },
   lastWorkspace: ({ profile: { lastWorkspace } }) => lastWorkspace || '',
