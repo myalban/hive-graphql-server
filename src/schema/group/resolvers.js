@@ -95,11 +95,16 @@ exports.Group = {
   name: async ({ name, oneToOne, workspace, members }, data,
     { mongo: { Workspaces, Users }, user }) => {
     if (oneToOne) {
-      const membersWithoutMyself = members.filter(m => m !== user._id);
+      const groupMembersWithoutMyself = members.filter(m => m !== user._id);
+
       const wk = await Workspaces.findOne({ _id: workspace });
-      const allWorkspaceMembers = await Users.find({ _id: { $in: wk.members } }).toArray();
+      const externalMembers = wk.externalMembers.map(m => m.userId);
+
+      const allWorkspaceMembers = wk.members.concat(externalMembers);
+      const users = await Users.find({ _id: { $in: allWorkspaceMembers } }).toArray();
+
       // Temporary until we cache display name on the user object (data loaders)
-      const dislplayNames = getDisplayNamesForUsers(membersWithoutMyself, allWorkspaceMembers);
+      const dislplayNames = getDisplayNamesForUsers(groupMembersWithoutMyself, users);
 
       return dislplayNames.join(', ');
     }
