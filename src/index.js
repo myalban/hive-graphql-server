@@ -44,6 +44,11 @@ const start = async () => {
       user = await checkAuth(authorization, { Users: mongo.Users, JWT_SECRET });
     }
 
+    // set user context if localhost
+    if (!user && LOCAL_METEOR_USER) {
+      user = await mongo.Users.findOne({ 'emails.address': LOCAL_METEOR_USER });
+    }
+
     return {
       context: {
         req,

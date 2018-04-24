@@ -27,7 +27,7 @@ const defaults = {
   JWT_SECRET: 'some_secret_this_is',
   METEOR_URL: 'meteor.hive.com',
   GRAPHQL_URL: 'graphql.hive.com',
-  LOCAL_METEOR_USER: 'test@mail.com',
+  LOCAL_METEOR_USER: '',
   MONGO_URL: 'mongodb://mongo.hive.com:3001',
   REDIS_URL: 'redis.hive.com',
   REDIS_PORT: 1234,

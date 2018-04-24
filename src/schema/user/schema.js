@@ -4,14 +4,16 @@ let File;
 let Group;
 let UserSettings;
 let User;
+let ActivityFeed;
 
-module.exports = () => [User, Group, UserSettings, File, Action, Base];
+module.exports = () => [User, Group, ActivityFeed, UserSettings, File, Action, Base];
 
 Base = require('../base');
 Action = require('../action/schema');
 File = require('../file/schema');
 Group = require('../group/schema');
 UserSettings = require('../user-settings/schema');
+ActivityFeed = require('../activity-feed/schema');
 
 User = `
   extend type Query {
