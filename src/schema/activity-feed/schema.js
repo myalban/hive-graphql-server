@@ -21,6 +21,7 @@ ActivityFeed = `
 
   type ActivityFeed {
     _id: ID! # unique id for the group
+    actorId: User # the user that created this notification (Activity feed)
     workspace: String!
     isRead: Boolean! # whether or not this activity feed has been marked as read
     type: String! # type of the activity feed
