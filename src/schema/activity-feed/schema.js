@@ -20,14 +20,14 @@ ActivityFeed = `
   }
 
   type ActivityFeed {
-    _id: ID! # unique id for the group
-    actorId: User # the user that created this notification (Activity feed)
+    _id: ID! # unique id for the ActivityFeed
+    actor: User # the user that created this notification (Activity feed)
     workspace: String!
     isRead: Boolean! # whether or not this activity feed has been marked as read
     type: String! # type of the activity feed
     assignedTo: String! # User that this activity feed assigned to
-    title: String # Title of the activity feed
-    body: String! # Body of the activity feed
+    title: String # Headline title of the activity feed, usually shows a short text value of the attached item. E.g. "My action 1" or "New reaction" or "New message"
+    body: String! # # Detailed description of what activity happened, e.g. "Max reacted to your message in 'Technical'" or "John assigned to Max"
     attachedItemType: String! # Indicates the source of the activity feed (e.g. message, actions, project)
     attachedItemId: String! # ID of the source of the activity feed (e.g. if attachedItemType is message then attachedItemId will be the messageId)
     projectName: String # name of the project if the source of the activity feed is project
