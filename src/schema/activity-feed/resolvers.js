@@ -3,7 +3,7 @@ import { limitQuery, applyPagination } from '../../utils/pagination-helpers';
 
 exports.Query = {
   activityFeeds: async (root, { isRead, first, last, before, after, sortField = 'createdAt', sortOrder = 1 }, { mongo: { ActivityFeeds, Workspaces }, user }) => {
-    const workspaces = await Workspaces.find({ members: { $in: [user._id] } }).toArray();
+    const workspaces = await Workspaces.find({ $or: [{ members: user._id }, { 'externalMembers.userId': user._id }] }).toArray();
 
     const workspaceIds = workspaces.map(wk => wk._id);
 
@@ -34,18 +34,21 @@ exports.Query = {
 
 exports.Mutation = {
   updateFeedAllRead: async (root, data, { user }) => {
-    callMethodAtEndpoint('updateFeedAllRead', { 'x-userid': user._id });
+    await callMethodAtEndpoint('updateFeedAllRead', { 'x-userid': user._id });
+    return true;
   },
   updateFeedRead: async (root, { attachedItemId, isRead }, { user }) => {
-    callMethodAtEndpoint('updateFeedRead', { 'x-userid': user._id }, [attachedItemId, isRead]);
+    await callMethodAtEndpoint('updateFeedRead', { 'x-userid': user._id }, [attachedItemId, isRead]);
+    return true;
   },
   updateMessagesFeedRead: async (root, { groupId }, { user }) => {
-    callMethodAtEndpoint('updateMessagesFeedRead', { 'x-userid': user._id }, [groupId]);
+    await callMethodAtEndpoint('updateMessagesFeedRead', { 'x-userid': user._id }, [groupId]);
+    return true;
   },
 };
 
 exports.ActivityFeed = {
-  actorId: async ({ actorId }, data, { mongo: { Users } }) => {
+  actor: async ({ actorId }, data, { mongo: { Users } }) => {
     return Users.findOne({ _id: actorId });
   },
 };
