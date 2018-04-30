@@ -9,7 +9,7 @@ exports.Query = {
 
     const q = {
       assignedTo: user._id,
-      historyItem: false,
+      historyItem: { $ne: true },
       deleted: false,
       workspace: { $in: workspaceIds },
     };
