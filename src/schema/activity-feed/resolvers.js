@@ -1,5 +1,17 @@
 import { callMethodAtEndpoint } from '../../meteor-helpers/method-endpoint';
 import { limitQuery, applyPagination } from '../../utils/pagination-helpers';
+import pubsub from '../../pubsub';
+
+exports.Subscription = {
+  activityFeedAdded: {
+    // asyncIterator w/ userId points to redis channel topic
+    subscribe: (root, args, { user }) => pubsub.asyncIterator(`activityFeedAdded.${user._id}`),
+  },
+  activityFeedChanged: {
+    // asyncIterator w/ userId points to redis channel topic
+    subscribe: (root, args, { user }) => pubsub.asyncIterator(`activityFeedChanged.${user._id}`),
+  },
+};
 
 exports.Query = {
   activityFeeds: async (root, { isRead, first, last, before, after, sortField = 'createdAt', sortOrder = 1 }, { mongo: { ActivityFeeds, Workspaces }, user }) => {
