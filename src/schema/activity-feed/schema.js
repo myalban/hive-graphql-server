@@ -13,6 +13,11 @@ ActivityFeed = `
     activityFeeds(isRead: Boolean, first: Int, after: String, last: Int, before: String, sortField: String, sortOrder: Int): ActivityFeedConnection
   }
 
+  extend type Subscription {
+    activityFeedAdded: ActivityFeed
+    activityFeedChanged: ActivityFeed
+  }
+
   extend type Mutation {
     updateFeedAllRead: Boolean # Mark all activity feeds as read
     updateFeedRead(attachedItemId: String!, isRead: Boolean!): Boolean # Mark activity all feeds with attachedItemId as read or unread

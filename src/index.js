@@ -23,6 +23,7 @@ const SUBSCRIPTIONS_EP = environment.isDev() ?
   `ws://localhost:${PORT}/subscriptions` :
   `wss://${GRAPHQL_URL}/subscriptions`;
 
+
 const start = async () => {
   const mongo = await connectMongo();
   const app = express();
@@ -115,6 +116,8 @@ const start = async () => {
 
   const server = createServer(app);
   server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+
     // Start WS subscription server
     SubscriptionServer.create(
       {
